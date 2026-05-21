@@ -1133,11 +1133,19 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   .mode-sw::-webkit-scrollbar { display: none; }
   .mode-btn {
     flex-shrink: 0;
-    padding: 5px 10px;
-    font-size: 11px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
     border-radius: 20px;
     border: 1px solid var(--bd2);
     background: var(--sf2);
+    color: var(--tx2);
+  }
+  .mode-btn.active {
+    background: var(--acc-s);
+    border-color: var(--acc-b);
+    color: var(--acc);
+    font-weight: 700;
   }
 
   /* Search */
@@ -1162,35 +1170,43 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   /* Category chips below topbar */
   .cat-chips-mobile {
     display: flex !important;
-    gap: 5px;
-    overflow-x: auto;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 8px;
+    overflow-x: scroll;
+    overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
     scrollbar-width: none;
-    padding: .4rem .75rem;
+    padding: 8px 12px;
     border-bottom: 1px solid var(--bd);
-    background: var(--sf);
-    position: sticky;
-    top: var(--topbar-h-mobile, 110px);
+    border-top: 1px solid var(--bd);
+    background: #0d0d1a;
     z-index: 50;
+    min-height: 44px;
   }
   .cat-chips-mobile::-webkit-scrollbar { display: none; }
   .cat-chip-m {
     flex-shrink: 0;
-    padding: 4px 10px;
-    border-radius: 20px;
-    border: 1px solid var(--bd2);
-    background: var(--sf2);
-    color: var(--tx3);
-    font-size: 11px;
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 14px;
+    border-radius: 22px;
+    border: 1.5px solid #555577;
+    background: #1e1e38;
+    color: #d0d0f0;
+    font-size: 13px;
     font-weight: 600;
     white-space: nowrap;
     cursor: pointer;
+    line-height: 1;
     transition: all .15s;
   }
   .cat-chip-m.active {
     background: var(--acc-s);
     border-color: var(--acc-b);
     color: var(--acc);
+    font-weight: 700;
   }
 
   /* Cards: single column on mobile */
@@ -1202,14 +1218,18 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 
   /* Card layout: vertical instead of side-by-side */
   .pcard-inner {
-    flex-direction: column;
-    padding: .6rem .75rem .3rem;
-    gap: 0;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto auto;
+  }
+  .pcard-col {
+    padding: .65rem .85rem;
   }
   .pcard-sep {
-    width: 100%;
-    height: 1px;
-    margin: .5rem 0;
+    height: 1px !important;
+    width: 100% !important;
+    min-width: 0;
+    background: var(--bd);
   }
   .pcard-phrase { font-size: 14px; }
   .pcard-phonetic { font-size: 10px; }
@@ -1246,24 +1266,16 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 
   /* Sidebar chapter buttons — show as chips on mobile */
   .ch-sidebar-btns {
-    display: flex !important;
-    gap: 5px;
-    overflow-x: auto;
-    padding: .3rem .75rem .4rem;
-    border-bottom: 1px solid var(--bd);
-    background: var(--sf);
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
+    display: none !important;
   }
-  .ch-sidebar-btns::-webkit-scrollbar { display: none; }
   .ch-chip-m {
     flex-shrink: 0;
-    padding: 3px 10px;
+    padding: 4px 11px;
     border-radius: 20px;
-    border: 1px solid var(--bd2);
-    background: var(--sf2);
-    color: var(--tx3);
-    font-size: 10px;
+    border: 1px solid rgba(249,115,22,.3);
+    background: rgba(249,115,22,.08);
+    color: var(--acc);
+    font-size: 11px;
     font-weight: 700;
     white-space: nowrap;
     cursor: pointer;
@@ -1273,6 +1285,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     background: var(--acc-s);
     border-color: var(--acc-b);
     color: var(--acc);
+    font-weight: 800;
   }
 
   /* Bottom progress bar */
@@ -1322,24 +1335,35 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 
 @media (max-width: 768px) {
   /* Fix scrolling on mobile */
+  html, body {
+    height: 100%;
+    overflow-x: clip;
+  }
   body {
-    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
   }
   .app-wrap {
+    flex-direction: column;
     overflow: visible;
-    min-height: calc(100vh - 120px);
+    flex: 1;
+    min-height: 0;
   }
   .main-content {
-    overflow: visible;
+    overflow-y: auto;
+    overflow-x: hidden;
     height: auto;
+    min-height: 0;
+    flex: 1;
   }
   .panel.active {
     display: block;
     overflow: visible;
   }
   .panel-body {
-    overflow: visible;
-    max-height: none;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: .5rem !important;
     height: auto;
   }
 
@@ -1410,6 +1434,8 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 </header>
 
 <!-- ═══════════ APP BODY ═══════════ -->
+<div class="cat-chips-mobile" id="cat-chips-mobile"></div>
+<div class="ch-sidebar-btns" id="ch-sidebar-btns"></div>
 <div class="app-wrap">
 
   <!-- SIDEBAR -->
@@ -1440,8 +1466,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
         <span class="content-header-badge" id="cats-hd-badge">– fraz</span>
         <button class="filter-unknown-btn" id="filter-unknown-btn" onclick="toggleUnknownFilter()" title="Pokaż tylko nieznane">👁 Wszystkie</button>
       </div>
-      <div class="cat-chips-mobile" id="cat-chips-mobile"></div>
-      <div class="ch-sidebar-btns" id="ch-sidebar-btns"></div>
       <div class="panel-body">
         <div class="phrases-grid" id="phrases-out"></div>
       </div>
@@ -1540,7 +1564,7 @@ const LANGS={
       {q:"¡Hola! ¿Cómo estás?",qp:"ola! komo estas",qt:"Cześć! Jak się masz?",a:"Bien, gracias! ¿Y tú?",ap:"bien grasias! i tu",at:"Dobrze, dzięki! A ty?"},
       {q:"¿Cómo te llamas?",qp:"komo te ljamas",qt:"Jak masz na imię?",a:"Me llamo Kacper. ¿Y tú?",ap:"me ljamo Kacper. i tu",at:"Mam na imię Kacper. A ty?"},
       {q:"¿De dónde eres?",qp:"de donde eres",qt:"Skąd jesteś?",a:"Soy de Polonia, de Gdynia. ¿Y tú?",ap:"soj de polonia, de gdinia. i tu",at:"Jestem z Polski, z Gdyni. A ty?"},
-      {q:"¿Cuántos años tienes?",qp:"kuantos anios tjenes",qt:"Ile masz lat?",a:"Tengo 27 años. ¿Y tú?",ap:"tengo 27 anios. i tu",at:"Mam 27 lat. A ty?"},
+      {q:"¿Cuántos años tienes?",qp:"kuantos anios tjenes",qt:"Ile masz lat?",a:"Tengo 27 años. ¿Y tú?",ap:"tengo 27 anios. i tu",at:"Mam 27 lat. A ty?",v:["Tengo veinticinco años. – Mam dwadzieścia pięć lat.","Tengo treinta años. – Mam trzydzieści lat.","Acabo de cumplir veintiocho. – Właśnie skończyłem dwadzieścia osiem."]},
       {q:"¿Eres de aquí?",qp:"eres de aki",qt:"Jesteś stąd?",a:"No, soy de Polonia! ¿Y tú de dónde eres?",ap:"no, soj de polonia! i tu de donde eres",at:"Nie, jestem z Polski! A ty skąd jesteś?"},
     ]},
     info:{title:"Kim jestem",phrases:[
@@ -1620,7 +1644,6 @@ const LANGS={
       {q:"¿Qué harás mañana?",qp:"ke aras maniana",qt:"Co będziesz robić jutro?",a:"Mañana voy a entrenar y luego quedaré con unos amigos.",ap:"maniana boj a entrenar i luego kedare kon unos amigos",at:"Jutro będę trenować a potem spotkam się z przyjaciółmi.",v:["Mañana tengo que trabajar. – Jutro muszę pracować.","Mañana no tengo planes. – Jutro nie mam planów.","Mañana salgo de viaje. – Jutro wyruszam w podróż."]},
     ]},
     numbers:{title:"Liczby i czas",phrases:[
-      {q:"¿Cuántos años tienes?",qp:"kuantos anios tjenes",qt:"Ile masz lat?",a:"Tengo veintisiete años. ¿Y tú?",ap:"tengo beintisjete anios. i tu",at:"Mam dwadzieścia siedem lat. A ty?",v:["Tengo veinticinco años. – Mam dwadzieścia pięć lat.","Tengo treinta años. – Mam trzydzieści lat.","Acabo de cumplir veintiocho. – Właśnie skończyłem dwadzieścia osiem."]},
       {q:"¿Qué hora es?",qp:"ke ora es",qt:"Która jest godzina?",a:"Son las tres y media. / Es la una en punto.",ap:"son las tres i media. es la una en punto",at:"Jest trzecia trzydzieści. / Jest dokładnie pierwsza.",v:["Son las ocho de la mañana. – Jest ósma rano.","Son las diez de la noche. – Jest dziesiąta wieczorem.","Es casi medianoche. – Jest prawie północ."]},
       {q:"¿Qué día es hoy?",qp:"ke dia es oj",qt:"Jaki dziś dzień?",a:"Hoy es lunes, el quince de marzo.",ap:"oj es lunes, el kjinse de marso",at:"Dziś jest poniedziałek, piętnasty marca.",v:["Hoy es viernes. – Dziś jest piątek.","Es el primero de enero. – Jest pierwszy stycznia.","Mañana es sábado. – Jutro jest sobota."]},
       {q:"Los días de la semana",qp:"los dias de la semana",qt:"Dni tygodnia",a:"Lunes, martes, miércoles, jueves, viernes, sábado, domingo.",ap:"lunes, martes, mjerkoles, chueves, bjernes, sabado, domingo",at:"Poniedziałek, wtorek, środa, czwartek, piątek, sobota, niedziela.",v:["El fin de semana es sábado y domingo. – Weekend to sobota i niedziela.","Los días laborables son de lunes a viernes. – Dni robocze to od poniedziałku do piątku.","Mi día favorito es el viernes. – Mój ulubiony dzień to piątek."]},
@@ -1676,7 +1699,7 @@ const LANGS={
       {q:"Hallo! Wie geht's?",qp:"halo! wi gets",qt:"Cześć! Jak się masz?",a:"Gut, danke! Und dir?",ap:"gut, danke! und dir",at:"Dobrze, dzięki! A ty?"},
       {q:"Wie heißt du?",qp:"wi hajst du",qt:"Jak masz na imię?",a:"Ich heiße Kacper. Und du?",ap:"ich hajse Kacper. und du",at:"Mam na imię Kacper. A ty?"},
       {q:"Woher kommst du?",qp:"woher komst du",qt:"Skąd jesteś?",a:"Ich komme aus Polen, aus Gdynia.",ap:"ich kome aus Polen, aus Gdynia",at:"Jestem z Polski, z Gdyni."},
-      {q:"Wie alt bist du?",qp:"wi alt bist du",qt:"Ile masz lat?",a:"Ich bin 27 Jahre alt. Und du?",ap:"ich bin 27 jare alt. und du",at:"Mam 27 lat. A ty?"},
+      {q:"Wie alt bist du?",qp:"wi alt bist du",qt:"Ile masz lat?",a:"Ich bin 27 Jahre alt. Und du?",ap:"ich bin 27 jare alt. und du",at:"Mam 27 lat. A ty?",v:["Ich bin fünfundzwanzig Jahre alt. – Mam dwadzieścia pięć lat.","Ich bin dreißig Jahre alt. – Mam trzydzieści lat.","Ich bin Anfang/Mitte/Ende zwanzig. – Jestem po dwudziestce/koło trzydziestki."]},
       {q:"Bist du von hier?",qp:"bist du fon hir",qt:"Jesteś stąd?",a:"Nein, ich komme aus Polen! Und du?",ap:"najn, ich kome aus Polen! und du",at:"Nie, jestem z Polski! A ty?"},
     ]},
     info:{title:"Kim jestem",phrases:[
@@ -1756,7 +1779,6 @@ const LANGS={
       {q:"Was machst du morgen?",qp:"vas machst du morgan",qt:"Co będziesz robić jutro?",a:"Morgen werde ich trainieren und dann Freunde treffen.",ap:"morgan verde ich trajniren und dan frojnde trefen",at:"Jutro będę trenować a potem spotkam przyjaciół.",v:["Morgen muss ich arbeiten. – Jutro muszę pracować.","Morgen habe ich keine Pläne. – Jutro nie mam planów.","Morgen reise ich ab. – Jutro wyruszam w podróż."]}
     ]},
     numbers:{title:"Liczby i czas",phrases:[
-      {q:"Wie alt bist du?",qp:"wi alt bist du",qt:"Ile masz lat?",a:"Ich bin siebenundzwanzig Jahre alt. Und du?",ap:"ich bin zibenundsvanzig jare alt. und du",at:"Mam dwadzieścia siedem lat. A ty?",v:["Ich bin fünfundzwanzig Jahre alt. – Mam dwadzieścia pięć lat.","Ich bin dreißig Jahre alt. – Mam trzydzieści lat.","Ich habe gerade achtundzwanzig. – Właśnie skończyłem dwadzieścia osiem."]},
       {q:"Wie spät ist es?",qp:"wi szpet ist es",qt:"Która jest godzina?",a:"Es ist halb vier. / Es ist genau ein Uhr.",ap:"es ist halb fir. / es ist genau ajn ur",at:"Jest w pół do czwartej. / Jest dokładnie pierwsza.",v:["Es ist acht Uhr morgens. – Jest ósma rano.","Es ist zehn Uhr abends. – Jest dziesiąta wieczorem.","Es ist fast Mitternacht. – Jest prawie północ."]},
       {q:"Welcher Tag ist heute?",qp:"velcher tag ist hojte",qt:"Jaki dziś dzień?",a:"Heute ist Montag, der fünfzehnte März.",ap:"hojte ist montag, der fynfsehnte merts",at:"Dziś jest poniedziałek, piętnasty marca.",v:["Heute ist Freitag. – Dziś jest piątek.","Es ist der erste Januar. – Jest pierwszy stycznia.","Morgen ist Samstag. – Jutro jest sobota."]},
       {q:"Die Wochentage",qp:"di wochentage",qt:"Dni tygodnia",a:"Montag, Dienstag, Mittwoch, Donnerstag, Freitag, Samstag, Sonntag.",ap:"montag, dinstag, mitvoch, donerstag, frajtag, zamstag, zontag",at:"Poniedziałek, wtorek, środa, czwartek, piątek, sobota, niedziela.",v:["Das Wochenende ist Samstag und Sonntag. – Weekend to sobota i niedziela.","Die Werktage sind Montag bis Freitag. – Dni robocze to od poniedziałku do piątku.","Mein Lieblingstag ist Freitag. – Mój ulubiony dzień to piątek."]},
@@ -1812,7 +1834,7 @@ const LANGS={
       {q:"Salut! Comment ça va?",qp:"salu! koman sa va",qt:"Cześć! Jak się masz?",a:"Ça va bien, merci! Et toi?",ap:"sa va bjen, mersi! e twa",at:"Dobrze, dzięki! A ty?"},
       {q:"Comment tu t'appelles?",qp:"koman tu tapel",qt:"Jak masz na imię?",a:"Je m'appelle Kacper. Et toi?",ap:"że mapel Kacper. e twa",at:"Mam na imię Kacper. A ty?"},
       {q:"Tu viens d'où?",qp:"tu vjen du",qt:"Skąd jesteś?",a:"Je viens de Pologne, de Gdynia.",ap:"że vjen de polon, de gdinia",at:"Jestem z Polski, z Gdyni."},
-      {q:"Tu as quel âge?",qp:"tu a kel asz",qt:"Ile masz lat?",a:"J'ai 27 ans. Et toi?",ap:"żej 27 an. e twa",at:"Mam 27 lat. A ty?"},
+      {q:"Tu as quel âge?",qp:"tu a kel asz",qt:"Ile masz lat?",a:"J'ai 27 ans. Et toi?",ap:"żej 27 an. e twa",at:"Mam 27 lat. A ty?",v:["J'ai vingt-cinq ans. – Mam dwadzieścia pięć lat.","J'ai la trentaine. – Jestem po trzydziestce.","Je ne fais pas mon âge! – Nie wyglądam na swój wiek!"]},
       {q:"T'es d'ici?",qp:"te disi",qt:"Jesteś stąd?",a:"Non, je viens de Pologne! Et toi?",ap:"non, że vjen de polon! e twa",at:"Nie, jestem z Polski! A ty?"},
     ]},
     info:{title:"Kim jestem",phrases:[
@@ -1889,7 +1911,6 @@ const LANGS={
       {q:"J'espère...",qp:"żesper",qt:"Mam nadzieję...",a:"J'espère qu'on pourra se voir bientôt.",ap:"żespot kon pura se vwar bjento",at:"Mam nadzieję że wkrótce się zobaczymy.",v:["J'espère apprendre le français rapidement. – Mam nadzieję szybko nauczyć się francuskiego.","J'espère qu'il fera beau. – Mam nadzieję że pogoda będzie ładna.","J'espère trouver du travail là-bas. – Mam nadzieję znaleźć tam pracę."]},
     ]},
     numbers:{title:"Liczby i czas",phrases:[
-      {q:"Tu as quel âge?",qp:"ty a kel asz",qt:"Ile masz lat?",a:"J'ai vingt-sept ans. Et toi?",ap:"żej ven-set an. e twa",at:"Mam dwadzieścia siedem lat. A ty?",v:["J'ai vingt-cinq ans. – Mam dwadzieścia pięć lat.","J'ai trente ans. – Mam trzydzieści lat.","Je viens d'avoir vingt-huit ans. – Właśnie skończyłem dwadzieścia osiem."]},
       {q:"Quelle heure est-il?",qp:"kel er e til",qt:"Która jest godzina?",a:"Il est trois heures et demie. / Il est une heure pile.",ap:"il e trwa zer e demi. il e yn er pil",at:"Jest trzecia trzydzieści. / Jest dokładnie pierwsza.",v:["Il est huit heures du matin. – Jest ósma rano.","Il est dix heures du soir. – Jest dziesiąta wieczorem.","Il est presque minuit. – Jest prawie północ."]},
       {q:"Quel jour sommes-nous?",qp:"kel żur som nu",qt:"Jaki dziś dzień?",a:"Aujourd'hui c'est lundi, le quinze mars.",ap:"ożurdwi se lendi, le kenz mars",at:"Dziś jest poniedziałek, piętnasty marca.",v:["Aujourd'hui c'est vendredi. – Dziś jest piątek.","C'est le premier janvier. – Jest pierwszy stycznia.","Demain c'est samedi. – Jutro jest sobota."]},
       {q:"Les jours de la semaine",qp:"le żur de la semen",qt:"Dni tygodnia",a:"Lundi, mardi, mercredi, jeudi, vendredi, samedi, dimanche.",ap:"lendi, mardi, merkrdi, żodi, vandrdi, samdi, dimansh",at:"Poniedziałek, wtorek, środa, czwartek, piątek, sobota, niedziela.",v:["Le week-end c'est samedi et dimanche. – Weekend to sobota i niedziela.","Les jours de travail c'est du lundi au vendredi. – Dni robocze to od poniedziałku do piątku.","Mon jour préféré c'est le vendredi. – Mój ulubiony dzień to piątek."]},
@@ -1949,7 +1970,7 @@ const LANGS={
       {q:"Привет! Как дела?",qp:"priviet! kak diela",qt:"Cześć! Jak się masz?",a:"Хорошо, спасибо! А ты как?",ap:"choroszho, spasibo! a ty kak",at:"Dobrze, dzięki! A ty?"},
       {q:"Как тебя зовут?",qp:"kak tebja zovut",qt:"Jak masz na imię?",a:"Меня зовут Кацпер. А тебя?",ap:"menja zovut Kacper. a tebja",at:"Mam na imię Kacper. A ty?"},
       {q:"Откуда ты?",qp:"otkuda ty",qt:"Skąd jesteś?",a:"Я из Польши, из Гдыни.",ap:"ja iz polszy, iz gdyni",at:"Jestem z Polski, z Gdyni."},
-      {q:"Сколько тебе лет?",qp:"skolko tebe let",qt:"Ile masz lat?",a:"Мне 27 лет. А тебе?",ap:"mne 27 let. a tebe",at:"Mam 27 lat. A ty?"},
+      {q:"Сколько тебе лет?",qp:"skolko tebe let",qt:"Ile masz lat?",a:"Мне 27 лет. А тебе?",ap:"mne 27 let. a tebe",at:"Mam 27 lat. A ty?",v:["Мне двадцать пять лет. – Mam dwadzieścia pięć lat.","Мне около тридцати. – Mam около trzydziestu lat.","Я выгляжу моложе своих лет! – Wyglądam młodziej niż mam lat!"]},
       {q:"Ты отсюда?",qp:"ty otsjuda",qt:"Jesteś stąd?",a:"Нет, я из Польши! А ты?",ap:"niet, ja iz polszy! a ty",at:"Nie, jestem z Polski! A ty?"}
     ]},
     info:{title:"Kim jestem",phrases:[
@@ -2026,7 +2047,6 @@ const LANGS={
       {q:"Я надеюсь...",qp:"ja nadiejus",qt:"Mam nadzieję...",a:"Я надеюсь, что мы скоро увидимся.",ap:"ja nadiejus, szto my skoro uwiidimsia",at:"Mam nadzieję że wkrótce się zobaczymy.",v:["Я надеюсь быстро выучить русский. – Mam nadzieję szybko nauczyć się rosyjskiego.","Я надеюсь на хорошую погоду. – Mam nadzieję na dobrą pogodę.","Я надеюсь найти там работу. – Mam nadzieję znaleźć tam pracę."]},
     ]},
     numbers:{title:"Liczby i czas",phrases:[
-      {q:"Сколько тебе лет?",qp:"skolko tiebie let",qt:"Ile masz lat?",a:"Мне двадцать семь лет. А тебе?",ap:"mnie dwadcat' siem' let. a tiebie",at:"Mam dwadzieścia siedem lat. A ty?",v:["Мне двадцать пять лет. – Mam dwadzieścia pięć lat.","Мне тридцать лет. – Mam trzydzieści lat.","Мне только что исполнилось двадцать восемь. – Właśnie skończyłem dwadzieścia osiem."]},
       {q:"Который час?",qp:"kotoryj czas",qt:"Która jest godzina?",a:"Половина четвёртого. / Ровно час.",ap:"połowina czetwortogo. / rowno czas",at:"Jest w pół do czwartej. / Jest dokładnie pierwsza.",v:["Восемь утра. – Jest ósma rano.","Десять вечера. – Jest dziesiąta wieczorem.","Почти полночь. – Jest prawie północ."]},
       {q:"Какой сегодня день?",qp:"kakoj siegodnia dien'",qt:"Jaki dziś dzień?",a:"Сегодня понедельник, пятнадцатое марта.",ap:"siegodnia poniedielnik, piatnadcatoje marta",at:"Dziś jest poniedziałek, piętnasty marca.",v:["Сегодня пятница. – Dziś jest piątek.","Первое января. – Jest pierwszy stycznia.","Завтра суббота. – Jutro jest sobota."]},
       {q:"Дни недели",qp:"dni niedieli",qt:"Dni tygodnia",a:"Понедельник, вторник, среда, четверг, пятница, суббота, воскресенье.",ap:"poniedielnik, wtornik, sreda, czetwerg, piatnica, subbota, woskresenie",at:"Poniedziałek, wtorek, środa, czwartek, piątek, sobota, niedziela.",v:["Выходные — это суббота и воскресенье. – Weekend to sobota i niedziela.","Рабочие дни с понедельника по пятницу. – Dni robocze to od poniedziałku do piątku.","Мой любимый день — пятница. – Mój ulubiony dzień to piątek."]},
@@ -2086,7 +2106,7 @@ const LANGS={
       {q:"Ciao! Come stai?",qp:"czao! kome staj",qt:"Cześć! Jak się masz?",a:"Bene, grazie! E tu?",ap:"bene, gracje! e tu",at:"Dobrze, dzięki! A ty?"},
       {q:"Come ti chiami?",qp:"kome ti kjami",qt:"Jak masz na imię?",a:"Mi chiamo Kacper. E tu?",ap:"mi kjamo Kacper. e tu",at:"Mam na imię Kacper. A ty?"},
       {q:"Di dove sei?",qp:"di dove sej",qt:"Skąd jesteś?",a:"Sono della Polonia, di Gdynia.",ap:"sono della polonia, di gdinia",at:"Jestem z Polski, z Gdyni."},
-      {q:"Quanti anni hai?",qp:"kwanti anni aj",qt:"Ile masz lat?",a:"Ho 27 anni. E tu?",ap:"o 27 anni. e tu",at:"Mam 27 lat. A ty?"},
+      {q:"Quanti anni hai?",qp:"kwanti anni aj",qt:"Ile masz lat?",a:"Ho 27 anni. E tu?",ap:"o 27 anni. e tu",at:"Mam 27 lat. A ty?",v:["Ho venticinque anni. – Mam dwadzieścia pięć lat.","Ho una trentina d'anni. – Jestem po trzydziestce.","Non li dimostro! – Nie wyglądam na swój wiek!"]},
       {q:"Sei di qui?",qp:"sej di kwi",qt:"Jesteś stąd?",a:"No, sono della Polonia! E tu?",ap:"no, sono della polonia! e tu",at:"Nie, jestem z Polski! A ty?"},
     ]},
     info:{title:"Kim jestem",phrases:[
@@ -2162,7 +2182,6 @@ const LANGS={
       {q:"Avevo intenzione di...",qp:"avevo intencione di",qt:"Miałem zamiar...",a:"Ho intenzione di imparare ancora tre lingue.",ap:"o intencione di imparare ancora tre lingue",at:"Mam zamiar nauczyć się jeszcze trzech języków.",v:["Ho intenzione di trasferirmi il mese prossimo. – Mam zamiar przeprowadzić się w przyszłym miesiącu.","Ho intenzione di dimagrire. – Mam zamiar schudnąć.","Ho intenzione di aprire un'azienda. – Mam zamiar założyć firmę."]},
     ]},
     numbers:{title:"Liczby i czas",phrases:[
-      {q:"Quanti anni hai?",qp:"kwanti anni aj",qt:"Ile masz lat?",a:"Ho ventisette anni. E tu?",ap:"o wentisette anni. e tu",at:"Mam dwadzieścia siedem lat. A ty?",v:["Ho venticinque anni. – Mam dwadzieścia pięć lat.","Ho trent'anni. – Mam trzydzieści lat.","Ho appena compiuto ventotto anni. – Właśnie skończyłem dwadzieścia osiem."]},
       {q:"Che ore sono?",qp:"ke ore sono",qt:"Która jest godzina?",a:"Sono le tre e mezza. / È l'una in punto.",ap:"sono le tre e mezza. / e luna in punto",at:"Jest trzecia trzydzieści. / Jest dokładnie pierwsza.",v:["Sono le otto di mattina. – Jest ósma rano.","Sono le dieci di sera. – Jest dziesiąta wieczorem.","È quasi mezzanotte. – Jest prawie północ."]},
       {q:"Che giorno è oggi?",qp:"ke dżorno e odżi",qt:"Jaki dziś dzień?",a:"Oggi è lunedì, il quindici marzo.",ap:"odżi e lunedi, il kwindiczi marzo",at:"Dziś jest poniedziałek, piętnasty marca.",v:["Oggi è venerdì. – Dziś jest piątek.","È il primo gennaio. – Jest pierwszy stycznia.","Domani è sabato. – Jutro jest sobota."]},
       {q:"I giorni della settimana",qp:"i dżorni della settimana",qt:"Dni tygodnia",a:"Lunedì, martedì, mercoledì, giovedì, venerdì, sabato, domenica.",ap:"lunedi, martedi, merkoledi, dżowedi, wenerdì, sabato, domenika",at:"Poniedziałek, wtorek, środa, czwartek, piątek, sobota, niedziela.",v:["Il fine settimana è sabato e domenica. – Weekend to sobota i niedziela.","I giorni lavorativi vanno da lunedì a venerdì. – Dni robocze to od poniedziałku do piątku.","Il mio giorno preferito è venerdì. – Mój ulubiony dzień to piątek."]},
@@ -2733,7 +2752,7 @@ const CHAPTERS = {
   react:    [1,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4],
   past:     [2,2,2,2,2,2,3,3,3,4,4],
   future:   [2,2,3,3,3,3,3],
-  numbers:  [1,1,1,2,2,1,1,2,2],
+  numbers:  [1,1,2,2,1,1,2,2],
   slang:    [4,3,3,4,3,4,4,4,3,3],
   mistakes: [1,1,1,2,2,2,1,2],
   bye:      [1,2,2,1,2],
@@ -2986,6 +3005,15 @@ function updateCatsHeader() {
     icon.textContent = '🔍';
     title.textContent = `Szukasz: "${searchQ}"`;
     sub.textContent = 'Wyniki wyszukiwania';
+  } else if (catF === 'all') {
+    icon.textContent = '📚';
+    title.textContent = 'Wszystkie zwroty';
+    sub.textContent = 'Wszystkie kategorie';
+  } else if (typeof catF === 'string' && catF.startsWith('__ch__')) {
+    const ch = parseInt(catF.replace('__ch__', ''));
+    icon.textContent = CHAPTER_ICONS[ch] || '📖';
+    title.textContent = CHAPTER_NAMES[ch] || 'Rozdział';
+    sub.textContent = 'Rozdział · Frazy';
   } else {
     icon.textContent = CAT_ICONS[catF] || '📌';
     title.textContent = CAT_LABELS[catF] || catF;
@@ -3056,8 +3084,8 @@ function renderCats() {
           </div>
         </div>
         <div class="pcard-footer">
-          <button class="know-btn${isKnown?' active':''}" id="${id}-kb" onclick="toggleKnown('${key}','${id}')">${isKnown?'✓ Znam':'+ Znam'}</button>
-          <button class="later-btn${later[key]?' active':''}" id="${id}-lb" onclick="toggleLater('${key}','${id}')">${later[key]?'↩ Wróć':'⏸ Później'}</button>
+          <button class="know-btn${isKnown?' active':''}" id="${id}-kb" data-key="${key}" data-id="${id}" onclick="toggleKnownCh(this)">${isKnown?'✓ Znam':'+ Znam'}</button>
+          <button class="later-btn${later[key]?' active':''}" id="${id}-lb" data-key="${key}" data-id="${id}" onclick="toggleLaterCh(this)">${later[key]?'↩ Wróć':'⏸ Później'}</button>
           ${hasVar ? `<button class="var-toggle" id="vt-${id}" onclick="toggleVar('vl-${id}','vt-${id}')">▼ warianty</button>` : ''}
         </div>
         ${hasVar ? `<div class="var-list" id="vl-${id}">
@@ -3193,12 +3221,17 @@ function showSc(key) {
 ═══════════════════════════════════════════════ */
 function toggleKnown(key, cardId) {
   known[key] = !known[key];
+  if (!known[key]) delete known[key];
   saveKnown();
-  document.querySelectorAll(`[id="${cardId}"]`).forEach(el => el.classList.toggle('known', !!known[key]));
-  document.querySelectorAll(`[id="${cardId}-kb"]`).forEach(btn => {
-    btn.textContent = known[key] ? '✓ Znam' : '+ Znam';
-    btn.classList.toggle('active', !!known[key]);
-  });
+  try {
+    document.querySelectorAll('[id="' + cardId + '"]').forEach(el => el.classList.toggle('known', !!known[key]));
+    document.querySelectorAll('[id="' + cardId + '-kb"]').forEach(btn => {
+      btn.textContent = known[key] ? '✓ Znam' : '+ Znam';
+      btn.classList.toggle('active', !!known[key]);
+    });
+  } catch(e) {}
+  updateProgress();
+  if (typeof renderMobileCatChips === 'function') renderMobileCatChips();
   renderSidebar();
 }
 
@@ -3617,12 +3650,34 @@ function toggleMic() {
 
 
 /* ═══ PÓŹNIEJ ═══ */
+
+function updateProgress() {
+  const cats = LANGS[lang].categories;
+  let total = 0, knownCount = 0;
+  Object.keys(cats).forEach(cat => {
+    const phrases = cats[cat].phrases || [];
+    total += phrases.length;
+    phrases.forEach((p, i) => {
+      if (known[knownKey(lang, cat, i)]) knownCount++;
+    });
+  });
+  const pct = total ? Math.round(knownCount / total * 100) : 0;
+  // Desktop sidebar progress
+  const pt = document.getElementById('sb-prog-text');
+  const pf = document.getElementById('sb-prog-fill');
+  if (pt) pt.textContent = knownCount + ' / ' + total + ' znanych';
+  if (pf) pf.style.width = pct + '%';
+  // Mobile progress bar
+  const mf = document.getElementById('mobile-prog-fill');
+  const mv = document.getElementById('mobile-prog-value');
+  if (mf) mf.style.width = pct + '%';
+  if (mv) mv.textContent = knownCount + '/' + total;
+}
 function toggleLater(key, cardId) {
   if (later[key]) {
     delete later[key];
   } else {
     later[key] = true;
-    // Remove "znam" if setting to later
     if (known[key]) {
       delete known[key];
       localStorage.setItem('kp_known', JSON.stringify(known));
@@ -3630,23 +3685,26 @@ function toggleLater(key, cardId) {
   }
   localStorage.setItem('kp_later', JSON.stringify(later));
 
-  // Update card classes
-  document.querySelectorAll(`[id="${cardId}"]`).forEach(el => {
-    el.classList.toggle('later', !!later[key]);
-    el.classList.toggle('known', !!known[key]);
-  });
+  try {
+    // Update card classes
+    const cards = document.querySelectorAll('[id="' + cardId + '"]');
+    cards.forEach(el => {
+      el.classList.toggle('later', !!later[key]);
+      el.classList.toggle('known', !!known[key]);
+    });
 
-  // Update buttons
-  const lb = document.getElementById(cardId + '-lb');
-  if (lb) {
-    lb.textContent = later[key] ? '↩ Wróć' : '⏸ Później';
-    lb.classList.toggle('active', !!later[key]);
-  }
-  const kb = document.getElementById(cardId + '-kb');
-  if (kb) {
-    kb.textContent = known[key] ? '✓ Znam' : '+ Znam';
-    kb.classList.toggle('active', !!known[key]);
-  }
+    // Update buttons
+    const lb = document.getElementById(cardId + '-lb');
+    if (lb) {
+      lb.textContent = later[key] ? '↩ Wróć' : '⏸ Później';
+      lb.classList.toggle('active', !!later[key]);
+    }
+    const kb = document.getElementById(cardId + '-kb');
+    if (kb) {
+      kb.textContent = known[key] ? '✓ Znam' : '+ Znam';
+      kb.classList.toggle('active', !!known[key]);
+    }
+  } catch(e) {}
 
   updateProgress();
 }
@@ -3886,6 +3944,7 @@ function setCatChapterDesktop(chNum) {
 
   renderChapterPhrasesDesktop(chNum);
   renderSidebar();
+  if (typeof renderMobileCatChips === 'function') renderMobileCatChips();
 }
 
 
@@ -3943,32 +4002,37 @@ function renderMobileCatChips() {
   const el = document.getElementById('cat-chips-mobile');
   if (!el) return;
   const cats = Object.keys(LANGS[lang].categories);
+
+  // Chapter chips first
+  const chChips = [1,2,3,4].map(ch => {
+    const {knownCount, total} = getChapterProgress(ch);
+    const isActive = catF === '__ch__' + ch;
+    return `<button class="cat-chip-m${isActive?' active':''}" onclick="setCatChapterDesktop(${ch})">
+      ${CHAPTER_ICONS[ch]} Rozdz.${ch} <span style="opacity:.6;font-size:10px;margin-left:4px">${knownCount}/${total}</span>
+    </button>`;
+  }).join('');
+
+  const isChapter = typeof catF === 'string' && catF.startsWith('__ch__');
+  const isAll = catF === 'all';
+
   el.innerHTML =
-    `<button class="cat-chip-m ${catF==='all'?'active':''}" onclick="setCatMobile('all')">Wszystkie</button>` +
+    `<button class="cat-chip-m ${isAll?'active':''}" onclick="setCatMobile('all')">Wszystkie</button>` +
+    chChips +
+    `<div style="width:1px;height:20px;background:var(--bd);flex-shrink:0;align-self:center"></div>` +
     cats.map(cat =>
-      `<button class="cat-chip-m ${catF===cat?'active':''}" onclick="setCatMobile('${cat}')">
+      `<button class="cat-chip-m ${(!isChapter && !isAll && catF===cat)?'active':''}" onclick="setCatMobile('${cat}')">
         ${CAT_ICONS[cat]||''} ${CAT_LABELS[cat]||cat}
       </button>`
     ).join('');
 }
 
 function renderMobileChChips() {
-  if (!isMobile()) return;
-  const el = document.getElementById('ch-sidebar-btns');
-  if (!el) return;
-  el.innerHTML = [1,2,3,4].map(ch => {
-    const {knownCount, total} = getChapterProgress(ch);
-    const isActive = catF === '__ch__' + ch;
-    return `<button class="ch-chip-m ${isActive?'active':''}" onclick="setCatChapterDesktop(${ch})">
-      ${CHAPTER_ICONS[ch]} Rozdz.${ch} <span style="opacity:.6">${knownCount}/${total}</span>
-    </button>`;
-  }).join('');
+  renderMobileCatChips(); // merged into single row
 }
 
 function setCatMobile(cat) {
   catF = cat;
   renderMobileCatChips();
-  renderMobileChChips();
   renderCats();
   updateCatsHeader();
 }
@@ -3989,60 +4053,25 @@ function updateMobileProgress() {
   if (val) val.textContent = knownCount + '/' + total;
 }
 
-// Patch updateProgress to also update mobile bar
-const _origUpdateProgress = updateProgress;
-updateProgress = function() {
-  _origUpdateProgress();
-  updateMobileProgress();
-};
+// updateMobileProgress is called directly from updateProgress override below
 
-// Patch renderCats to also render mobile chips
-const _origRenderCats = renderCats;
-renderCats = function() {
-  _origRenderCats();
-  if (isMobile()) {
-    renderMobileCatChips();
-    renderMobileChChips();
-  }
-};
+// renderCats mobile chips called via DOMContentLoaded
 
-// Patch setLang to update mobile chips
-const _origSetLang = setLang;
-setLang = function(l, btn) {
-  _origSetLang(l, btn);
-  if (isMobile()) {
-    renderMobileCatChips();
-    renderMobileChChips();
-    updateMobileProgress();
-  }
-};
+// setLang mobile handled via direct calls
 
-// Patch setCat to update mobile chips
-const _origSetCat = setCat;
-setCat = function(cat) {
-  _origSetCat(cat);
-  if (isMobile()) {
-    renderMobileCatChips();
-  }
-};
 
-// Patch setCatChapterDesktop to update mobile chips
-const _origSetCatChapter = setCatChapterDesktop;
-setCatChapterDesktop = function(chNum) {
-  _origSetCatChapter(chNum);
-  if (isMobile()) {
-    renderMobileChChips();
-    renderMobileCatChips();
-  }
-};
+
+
 
 // Init mobile on load
 window.addEventListener('DOMContentLoaded', () => {
-  updateMobileProgress();
-  if (isMobile()) {
-    renderMobileCatChips();
-    renderMobileChChips();
-  }
+  setTimeout(() => {
+    updateMobileProgress();
+    if (isMobile()) {
+      renderMobileCatChips();
+      updateCatsHeader();
+    }
+  }, 80);
 });
 
 // Handle resize
