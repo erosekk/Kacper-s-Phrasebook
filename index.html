@@ -1398,6 +1398,88 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   }
 }
 
+
+/* ═══ ADD LANGUAGE MODAL ═══ */
+.add-lang-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  border: 1.5px dashed var(--bd3);
+  background: transparent;
+  color: var(--tx3);
+  font-size: 18px;
+  cursor: pointer;
+  transition: all .15s;
+  flex-shrink: 0;
+}
+.add-lang-btn:hover { border-color: var(--acc-b); color: var(--acc); background: var(--acc-s); }
+
+.lang-modal-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,7,.7);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+.lang-modal-overlay.open { display: flex; }
+.lang-modal {
+  background: var(--sf);
+  border: 1px solid var(--bd2);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  width: 360px;
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.lang-modal-title {
+  font-size: 15px; font-weight: 800; color: var(--tx);
+  margin-bottom: 1rem;
+}
+.lang-modal-list { display: flex; flex-direction: column; gap: 6px; }
+.lang-modal-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: .65rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--bd2);
+  background: var(--sf2);
+  cursor: pointer;
+  transition: all .15s;
+  font-size: 13px; font-weight: 600; color: var(--tx2);
+}
+.lang-modal-item:hover { border-color: var(--acc-b); color: var(--acc); background: var(--acc-s); }
+.lang-modal-item.added { opacity: .4; cursor: default; pointer-events: none; }
+.lang-modal-item .flag { font-size: 20px; }
+.lang-modal-close {
+  margin-top: 1rem; width: 100%;
+  padding: .55rem; border-radius: var(--radius-md);
+  border: 1px solid var(--bd2); background: transparent;
+  color: var(--tx3); font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .15s;
+}
+.lang-modal-close:hover { border-color: var(--bd3); color: var(--tx2); }
+.lang-remove-btn {
+  margin-left: auto;
+  padding: 2px 8px; border-radius: var(--radius-sm);
+  border: 1px solid rgba(239,68,68,.3); background: transparent;
+  color: #f87171; font-size: 10px; font-weight: 700;
+  cursor: pointer; transition: all .15s;
+}
+.lang-remove-btn:hover { background: rgba(239,68,68,.1); }
+
+
+/* ═══ Japanese chars display (small under phonetic) ═══ */
+.ja-chars {
+  font-size: 10px;
+  color: var(--tx4, var(--tx3));
+  font-weight: 400;
+  display: block;
+  margin-top: 1px;
+  letter-spacing: .02em;
+}
+
 </style>
 </head>
 <body>
@@ -1415,6 +1497,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     <button class="lang-btn" onclick="setLang('fr',this)"><span class="flag">🇫🇷</span>Francuski</button>
     <button class="lang-btn" onclick="setLang('ru',this)"><span class="flag">🇷🇺</span>Rosyjski</button>
     <button class="lang-btn" onclick="setLang('it',this)"><span class="flag">🇮🇹</span>Włoski</button>
+      <button class="add-lang-btn" onclick="openLangModal()" title="Dodaj język">➕</button>
   </div>
 
   <div class="topbar-spacer"></div>
@@ -1919,7 +2002,6 @@ const LANGS={
       {q:"Les chiffres: 1-20",qp:"le szifr: en a ven",qt:"Liczby 1-20",a:"Un, deux, trois, quatre, cinq, six, sept, huit, neuf, dix, onze, douze, treize, quatorze, quinze, seize, dix-sept, dix-huit, dix-neuf, vingt.",ap:"en, do, trwa, katr, senk, sis, set, wuit, nef, dis, onz, duz, trez, katorz, kenz, sez, di-set, di-wuit, di-nef, ven",at:"1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20.",v:["Onze (11), douze (12), treize (13), quatorze (14), quinze (15). – 11, 12, 13, 14, 15.","Seize (16), dix-sept (17), dix-huit (18), dix-neuf (19). – 16=seize, 17-19 to 10+cyfra.","Vingt et un (21) = vingt + et + un. – 21 = dwadzieścia + i + jeden."]},
       {q:"Les chiffres: 30-90",qp:"le szifr: trante a katrwen-dis",qt:"Dziesiątki 30-90 (uwaga na 70, 80, 90!)",a:"Trente (30), quarante (40), cinquante (50), soixante (60), soixante-dix (70), quatre-vingts (80), quatre-vingt-dix (90), cent (100).",ap:"trante, karante, senkante, swasante, swasante-dis, katr-ven, katr-ven-dis, san",at:"30, 40, 50, 60, 70=60+10!, 80=4×20!, 90=4×20+10!, 100.",v:["Trente et un (31), quarante-deux (42)... – 31, 32...","Soixante-dix (70) = soixante + dix. Quatre-vingts (80) = 4 × vingt! – Uwaga na nieregularne!","Cent (100), deux cents (200), cinq cents (500), mille (1000). – 100, 200, 500, 1000."]},
       {q:"Depuis combien de temps tu es là?",qp:"depwi kombjen de tan ty e la",qt:"Jak długo tu jesteś?",a:"Je suis là depuis trois semaines. Je suis arrivé lundi.",ap:"że swi la depwi trwa semen. że swi arive lendi",at:"Jestem tu od trzech tygodni. Przyjechałem w poniedziałek.",v:["Je suis là depuis deux jours. – Jestem tu od dwóch dni.","Je suis arrivé il y a un mois. – Przyjechałem miesiąc temu.","Je reste encore une semaine. – Zostaję jeszcze tydzień."]},
-    ,
       {q:"J'ai l'intention de...",qp:"żej lantansion de",qt:"Mam zamiar...",a:"J'ai l'intention d'apprendre encore trois langues.",ap:"żej lantansion daprandr ankor trwa lang",at:"Mam zamiar nauczyć się jeszcze trzech języków.",v:["J'ai l'intention de déménager le mois prochain. – Mam zamiar przeprowadzić się w przyszłym miesiącu.","J'ai l'intention de maigrir. – Mam zamiar schudnąć.","J'ai l'intention de créer une entreprise. – Mam zamiar założyć firmę."]},
       {q:"Quels sont tes projets?",qp:"kel son te proże",qt:"Jakie masz plany?",a:"Je ne sais pas encore, mais je veux beaucoup voyager.",ap:"że ne se pa ankor, me że vo boku vwajache",at:"Jeszcze nie wiem, ale chcę dużo podróżować.",v:["Je n'ai pas encore de plans précis. – Nie mam jeszcze konkretnych planów.","Ça dépend de comment ça se passe. – Zależy jak pójdą sprawy.","Je veux faire quelque chose de nouveau l'année prochaine. – Chcę zrobić coś nowego w przyszłym roku."]},
       {q:"Qu'est-ce que tu feras demain?",qp:"kes ke ty fera demen",qt:"Co będziesz robić jutro?",a:"Demain je vais m'entraîner et voir des amis.",ap:"demen że be mantrane e vwar de zami",at:"Jutro będę trenować i spotkam się z przyjaciółmi.",v:["Demain je dois travailler. – Jutro muszę pracować.","Demain je n'ai rien de prévu. – Jutro nie mam planów.","Demain je pars en voyage. – Jutro wyruszam w podróż."]}
@@ -2055,7 +2137,6 @@ const LANGS={
       {q:"Числа: 1-20",qp:"czisła: odin do dwadcat",qt:"Liczby 1-20",a:"Один, два, три, четыре, пять, шесть, семь, восемь, девять, десять, одиннадцать, двенадцать, тринадцать, четырнадцать, пятнадцать, шестнадцать, семнадцать, восемнадцать, девятнадцать, двадцать.",ap:"odin, dwa, tri, czetyrje, pjat', szest', siem', wosiem', diewiat', diesiat', odinnadcat'...",at:"1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20.",v:["Одиннадцать (11), двенадцать (12), тринадцать (13)... – 11, 12, 13... (końcówka -надцать)","Четырнадцать (14), пятнадцать (15), шестнадцать (16)... – 14, 15, 16...","Двадцать один (21) = двадцать + один. – 21 = dwadzieścia + jeden."]},
       {q:"Числа: 30-90",qp:"czisła: trydcat do dziewianosta",qt:"Dziesiątki 30-90",a:"Тридцать (30), сорок (40), пятьдесят (50), шестьдесят (60), семьдесят (70), восемьдесят (80), девяносто (90), сто (100).",ap:"tricat', sorok, piat'diesiat, szest'diesiat, siem'diesiat, wosiem'diesiat, diewianosto, sto",at:"30, 40, 50, 60, 70, 80, 90, 100. Uwaga: сорок (40) i девяносто (90) są nieregularne!",v:["Тридцать один (31), тридцать два (32)... – 31, 32...","Сорок пять (45), пятьдесят три (53)... – 45, 53... (сорок jest nieregularne!)","Сто (100), двести (200), пятьсот (500), тысяча (1000). – 100, 200, 500, 1000."]},
       {q:"Как давно ты здесь?",qp:"kak dawno ty zdies",qt:"Jak długo tu jesteś?",a:"Я здесь уже три недели. Я приехал в понедельник.",ap:"ja zdes' uzhe tri niedieli. ja prijechał w poniedielnik",at:"Jestem tu od trzech tygodni. Przyjechałem w poniedziałek.",v:["Я здесь уже два дня. – Jestem tu od dwóch dni.","Я приехал месяц назад. – Przyjechałem miesiąc temu.","Я остаюсь ещё на неделю. – Zostaję jeszcze tydzień."]},
-    ,
       {q:"Я собираюсь...",qp:"ja sobirajus",qt:"Mam zamiar...",a:"Я собираюсь выучить ещё три языка.",ap:"ja sobirajus wyuczyti jeszto tri jazyka",at:"Mam zamiar nauczyć się jeszcze trzech języków.",v:["Я собираюсь переехать в следующем месяце. – Mam zamiar przeprowadzić się w przyszłym miesiącu.","Я собираюсь похудеть. – Mam zamiar schudnąć.","Я собираюсь открыть бизнес. – Mam zamiar założyć firmę."]},
       {q:"Какие у тебя планы?",qp:"kakije u tiebie plany",qt:"Jakie masz plany?",a:"Ещё не знаю, но хочу много путешествовать.",ap:"jeszto nie znaju, no chotszu mnogo puteszestwoat'",at:"Jeszcze nie wiem, ale chcę dużo podróżować.",v:["У меня пока нет конкретных планов. – Nie mam jeszcze konkretnych planów.","Смотря, как всё пойдёт. – Zależy jak pójdą sprawy.","Хочу попробовать что-то новое в следующем году. – Chcę spróbować czegoś nowego w przyszłym roku."]},
       {q:"Что ты будешь делать завтра?",qp:"szto ty budiesz dielat' zawtra",qt:"Co będziesz robić jutro?",a:"Завтра буду тренироваться, а потом встречусь с друзьями.",ap:"zawtra budu trenirowatsia, a potom wstreczus' s druzjami",at:"Jutro będę trenować a potem spotkam się z przyjaciółmi.",v:["Завтра надо работать. – Jutro muszę pracować.","Завтра у меня нет планов. – Jutro nie mam planów.","Завтра уезжаю. – Jutro wyruszam."]}
@@ -2190,7 +2271,6 @@ const LANGS={
       {q:"I numeri: 1-20",qp:"i numeri: uno a wenti",qt:"Liczby 1-20",a:"Uno, due, tre, quattro, cinque, sei, sette, otto, nove, dieci, undici, dodici, tredici, quattordici, quindici, sedici, diciassette, diciotto, diciannove, venti.",ap:"uno, due, tre, kwattro, czinkwe, sej, sette, otto, nove, dieczi, undiczi, dodicz, tredict, kwattordicz, kwindiczi, sedicz, dicsassette, dicsotto, dicanove, wenti",at:"1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20.",v:["Undici (11), dodici (12), tredici (13), quattordici (14), quindici (15). – 11, 12, 13, 14, 15.","Sedici (16), diciassette (17), diciotto (18), diciannove (19). – 16, 17, 18, 19.","Ventuno (21) = venti + uno (bez 'i'!). – 21 — uwaga na skrócenie!"]},
       {q:"I numeri: 30-90",qp:"i numeri: trenta a nowanta",qt:"Dziesiątki 30-90",a:"Trenta (30), quaranta (40), cinquanta (50), sessanta (60), settanta (70), ottanta (80), novanta (90), cento (100).",ap:"trenta, kwaranta, czinkwanta, sessanta, settanta, ottanta, nowanta, czento",at:"30, 40, 50, 60, 70, 80, 90, 100.",v:["Trentuno (31), trentadue (32)... – 31, 32... (łączy się bez spacji!)","Quarantacinque (45), cinquantatré (53)... – 45, 53...","Cento (100), duecento (200), cinquecento (500), mille (1000). – 100, 200, 500, 1000."]},
       {q:"Da quanto tempo sei qui?",qp:"da kwanto tempo sej kwi",qt:"Jak długo tu jesteś?",a:"Sono qui da tre settimane. Sono arrivato lunedì.",ap:"sono kwi da tre settimane. sono arrivato lunedi",at:"Jestem tu od trzech tygodni. Przyjechałem w poniedziałek.",v:["Sono qui da due giorni. – Jestem tu od dwóch dni.","Sono arrivato un mese fa. – Przyjechałem miesiąc temu.","Rimango ancora una settimana. – Zostaję jeszcze tydzień."]},
-    ,
       {q:"Ho intenzione di...",qp:"o intencione di",qt:"Planuję... / Mam zamiar...",a:"Ho intenzione di restare due settimane in Italia.",ap:"o intencione di restare due settimane in italia",at:"Planuję zostać dwa tygodnie we Włoszech.",v:["Ho intenzione di studiare italiano ogni giorno. – Planuję uczyć się włoskiego każdego dnia.","Ho intenzione di risparmiare per il viaggio. – Planuję oszczędzać na podróż.","Ho intenzione di visitare Roma e Milano. – Planuję odwiedzić Rzym i Mediolan."]},
       {q:"Quali sono i tuoi piani?",qp:"kwali sono i tuoi piani",qt:"Jakie masz plany?",a:"Non lo so ancora, ma voglio viaggiare molto.",ap:"non lo so ancora, ma wołio viaddżare molto",at:"Jeszcze nie wiem, ale chcę dużo podróżować.",v:["Non ho ancora piani precisi. – Nie mam jeszcze konkretnych planów.","Dipende da come vanno le cose. – Zależy jak pójdą sprawy.","Voglio fare qualcosa di nuovo l'anno prossimo. – Chcę zrobić coś nowego w przyszłym roku."]},
       {q:"Cosa farai domani?",qp:"koza faraj domani",qt:"Co będziesz robić jutro?",a:"Domani mi allenerò e poi vedrò degli amici.",ap:"domani mi allenerò e poi wedro deli amiczi",at:"Jutro będę trenować a potem spotkam przyjaciół.",v:["Domani devo lavorare. – Jutro muszę pracować.","Domani non ho piani. – Jutro nie mam planów.","Domani parto per un viaggio. – Jutro wyruszam w podróż."]}
@@ -2236,6 +2316,676 @@ const LANGS={
       {q:"È stato un piacere conoscerti!",qp:"e stato un pjaczere konosczerti",qt:"Miło cię było poznać!",a:"Anche per me! In bocca al lupo!",ap:"anke per me! in bokka al lupo",at:"Wzajemnie! Powodzenia! (dosł. w pysk wilka!)"},
     ]},
   }},
+  el:{color:"#1d4ed8",flag:"🇬🇷",name:"Grecki",categories:{
+    greet:{title:"Powitanie",phrases:[
+      {q:"Γεια σου! Πώς είσαι;",qp:"ja su! pos ise",qt:"Cześć! Jak się masz?",a:"Καλά, ευχαριστώ! Εσύ;",ap:"kala, efcharisto! esi",at:"Dobrze, dziękuję! A ty?"},
+      {q:"Πώς σε λένε;",qp:"pos se lene",qt:"Jak masz na imię?",a:"Με λένε Κάσπερ. Εσένα;",ap:"me lene Kasper. esena",at:"Mam na imię Kacper. A ty?"},
+      {q:"Από πού είσαι;",qp:"apo pu ise",qt:"Skąd jesteś?",a:"Είμαι από την Πολωνία, από τη Γκντύνια. Εσύ;",ap:"ime apo tin Polonia, apo ti Gdinia. esi",at:"Jestem z Polski, z Gdyni. A ty?"},
+      {q:"Πόσο χρονών είσαι;",qp:"poso chronon ise",qt:"Ile masz lat?",a:"Είμαι είκοσι επτά χρονών. Εσύ;",ap:"ime ikosi epta chronon. esi",at:"Mam dwadzieścia siedem lat. A ty?",v:["Είμαι είκοσι πέντε χρονών. – Mam 25 lat.","Είμαι τριάντα χρονών. – Mam 30 lat.","Δεν τα δείχνω! – Nie wyglądam na swój wiek!"]},
+      {q:"Είσαι από εδώ;",qp:"ise apo edo",qt:"Jesteś stąd?",a:"Όχι, είμαι από την Πολωνία. Εσύ από πού είσαι;",ap:"ochi, ime apo tin Polonia. esi apo pu ise",at:"Nie, jestem z Polski. A ty skąd jesteś?"}
+    ]},
+    info:{title:"Kim jestem",phrases:[
+      {q:"Τι δουλειά κάνεις;",qp:"ti dulja kanis",qt:"Czym się zajmujesz?",a:"Δουλεύω στο λιμάνι. Το trading είναι χόμπι μου. Έχω επισκεφτεί 43 χώρες και μαθαίνω 5 γλώσσες. Εσύ;",ap:"dulevo sto limani. to trading ine chobi mu. echo episkefte 43 chores ke matheno 5 glosses. esi",at:"Pracuję w porcie. Trading to moje hobby. Byłem w 43 krajach i uczę się 5 języków. A ty?"},
+      {q:"Δουλεύεις ή σπουδάζεις;",qp:"dulevisis i spudazis",qt:"Pracujesz czy studiujesz?",a:"Δουλεύω. Εσύ;",ap:"dulevo. esi",at:"Pracuję. A ty?"},
+      {q:"Πού μένεις ακριβώς;",qp:"pu menis akripos",qt:"Gdzie dokładnie mieszkasz?",a:"Μένω στη Γκντύνια, κοντά στο Γκντανσκ. Εσύ;",ap:"meno sti Gdinia, konda sto Gdansk. esi",at:"Mieszkam w Gdyni, blisko Gdańska. A ty?"},
+      {q:"Έχεις αδέρφια;",qp:"echis aderfia",qt:"Masz rodzeństwo?",a:"Ναι, έχω μια αδερφή. Εσύ;",ap:"ne, echo mia aderfi. esi",at:"Tak, mam siostrę. A ty?"},
+      {q:"Έχεις ζήσει σε άλλη χώρα;",qp:"echis zisi se ali chora",qt:"Mieszkałeś w innym kraju?",a:"Όχι, αλλά έχω ταξιδέψει πολύ. Εσύ;",ap:"ochi, ala echo taksidefsi poli. esi",at:"Nie, ale dużo podróżowałem. A ty?"}
+    ]},
+    hobby:{title:"Hobby",phrases:[
+      {q:"Τι κάνεις στον ελεύθερο χρόνο σου;",qp:"ti kanis ston elefthero chrono su",qt:"Co robisz w wolnym czasie?",a:"Παίζω βιντεοπαιχνίδια, παρακολουθώ σειρές και πάω γυμναστήριο.",ap:"pezo videopechnidja, parakolutho sires ke pao gimnastirio",at:"Gram w gry video, oglądam seriale i chodzę na siłownię."},
+      {q:"Ασχολείσαι με αθλήματα;",qp:"ascholise me athlimata",qt:"Uprawiasz jakiś sport?",a:"Ναι, πάω γυμναστήριο τακτικά. Εσύ;",ap:"ne, pao gimnastirio taktika. esi",at:"Tak, regularnie chodzę na siłownię. A ty?"},
+      {q:"Τι μουσική ακούς;",qp:"ti musikj akus",qt:"Jakiej muzyki słuchasz?",a:"Μου αρέσει το rap, η pop και το rock. Εσύ;",ap:"mu aresi to rap, i pop ke to rock. esi",at:"Lubię rap, pop i rock. A ty?"},
+      {q:"Σου αρέσει το ταξίδι;",qp:"su aresi to taksidi",qt:"Lubisz podróżować?",a:"Ναι, πολύ! Έχω πάει σε 43 χώρες.",ap:"ne, poli! echo pai se 43 chores",at:"Tak, bardzo! Byłem w 43 krajach."},
+      {q:"Τι σειρές παρακολουθείς;",qp:"ti sires parakoluthis",qt:"Jakie seriale oglądasz?",a:"Βλέπω σειρές στο Netflix και HBO. Εσύ;",ap:"blepo sires sto Netflix ke HBO. esi",at:"Oglądam seriale na Netflixie i HBO. A ty?"},
+      {q:"Παίζεις βιντεοπαιχνίδια;",qp:"pezis videopechnidja",qt:"Grasz w gry video?",a:"Ναι, πολύ! Κυρίως στον υπολογιστή.",ap:"ne, poli! kiries ston ipoloyisti",at:"Tak, dużo! Głównie na PC."}
+    ]},
+    why:{title:"Dlaczego uczę się",phrases:[
+      {q:"Γιατί μαθαίνεις ελληνικά;",qp:"gjati mathenis elinika",qt:"Dlaczego uczysz się greckiego?",a:"Γιατί μου αρέσει η γλώσσα και θέλω να ταξιδέψω στην Ελλάδα.",ap:"gjati mu aresi i glosa ke thelo na taksidefso stin Elada",at:"Bo lubię ten język i chcę odwiedzić Grecję."},
+      {q:"Πόσο καιρό μαθαίνεις ελληνικά;",qp:"poso kero mathenis elinika",qt:"Jak długo uczysz się greckiego?",a:"Μερικές εβδομάδες. Μόλις άρχισα.",ap:"merikis evdomades. molis archisa",at:"Kilka tygodni. Właśnie zacząłem."},
+      {q:"Πώς μαθαίνεις τη γλώσσα;",qp:"pos mathenis ti glosa",qt:"Jak uczysz się języka?",a:"Με εφαρμογές, βίντεο και με native speakers.",ap:"me efarmogjes, video ke me native speakers",at:"Przez aplikacje, filmy i z native speakerami."},
+      {q:"Θέλεις να επισκεφτείς την Ελλάδα;",qp:"thelis na episkefte tin Elada",qt:"Chcesz odwiedzić Grecję?",a:"Ναι, πολύ! Ειδικά τα νησιά.",ap:"ne, poli! idika ta nisia",at:"Tak, bardzo! Szczególnie wyspy."},
+      {q:"Μαθαίνεις και άλλες γλώσσες;",qp:"mathenis ke ales gloses",qt:"Uczysz się też innych języków?",a:"Ναι, μαθαίνω πέντε γλώσσες συνολικά.",ap:"ne, matheno pende gloses sinolika",at:"Tak, uczę się pięciu języków łącznie."},
+      {q:"Είναι δύσκολα τα ελληνικά;",qp:"ine diskola ta elinika",qt:"Czy grecki jest trudny?",a:"Το αλφάβητο είναι η μεγαλύτερη πρόκληση!",ap:"to alfabito ine i megalyteri proklisi",at:"Alfabet to największe wyzwanie!"},
+      {q:"Πώς πάει το ελληνικό σου;",qp:"pos pei to eliniko su",qt:"Jak idzie ci grecki?",a:"Μιλάω μόνο λίγο ελληνικά. Μαθαίνω κάθε μέρα.",ap:"milao mono ligo elinika. matheno kathe mera",at:"Tylko trochę gadam po grecku. Uczę się codziennie."}
+    ]},
+    travel:{title:"Podróże",phrases:[
+      {q:"Έχεις ταξιδέψει πολύ;",qp:"echis taksidefsi poli",qt:"Dużo podróżowałeś?",a:"Ναι, έχω πάει σε 43 χώρες. Εσύ;",ap:"ne, echo pai se 43 chores. esi",at:"Tak, byłem w 43 krajach. A ty?"},
+      {q:"Ποια χώρα σου άρεσε περισσότερο;",qp:"pja chora su arese perisotero",qt:"Który kraj podobał ci się najbardziej?",a:"Η Ισπανία ήταν εκπληκτική! Έχω πάει τρεις φορές.",ap:"i Ispania itan ekpliktiki! echo pai tris fores",at:"Hiszpania była niesamowita! Byłem tam trzy razy."},
+      {q:"Θέλεις να ταξιδέψεις περισσότερο;",qp:"thelis na taksidefsis perisotero",qt:"Chcesz więcej podróżować?",a:"Ναι, θέλω να επισκεφτώ όλες τις χώρες!",ap:"ne, thelo na episkepto oles tis chores",at:"Tak, chcę odwiedzić wszystkie kraje!"},
+      {q:"Ποια χώρα θέλεις να επισκεφτείς;",qp:"pja chora thelis na episkefte",qt:"Który kraj chcesz odwiedzić?",a:"Θέλω να πάω στην Ιαπωνία και στην Κορέα.",ap:"thelo na pao stin Japonia ke stin Korea",at:"Chcę pojechać do Japonii i Korei."},
+      {q:"Πού μένεις όταν ταξιδεύεις;",qp:"pu menis otan taksidjevis",qt:"Gdzie mieszkasz gdy podróżujesz?",a:"Συνήθως σε ξενοδοχεία ή Airbnb.",ap:"sinitos se ksenodhochja i Airbnb",at:"Zazwyczaj w hotelach lub Airbnb."},
+      {q:"Ταξιδεύεις μόνος;",qp:"taksidjevis monos",qt:"Podróżujesz sam?",a:"Συχνά μόνος, αλλά και με φίλους.",ap:"sichna monos, ala ke me filus",at:"Często sam, ale też z przyjaciółmi."},
+      {q:"Ποιο είναι το αγαπημένο σου μέρος;",qp:"pjo ine to agapimeno su meros",qt:"Jakie jest twoje ulubione miejsce?",a:"Η Βαρκελώνη ήταν εκπληκτική.",ap:"i Varkeloni itan ekpliktiki",at:"Barcelona była niesamowita."},
+      {q:"Πόσο καιρό ταξιδεύεις;",qp:"poso kero taksidjevis",qt:"Jak długo podróżujesz?",a:"Συνήθως μια-δυο εβδομάδες κάθε φορά.",ap:"sinitos mia-dio evdomades kathe fora",at:"Zazwyczaj tydzień-dwa za każdym razem."},
+      {q:"Ταξίδεψες ποτέ στην Ελλάδα;",qp:"taksidefsis pote stin Elada",qt:"Byłeś kiedyś w Grecji?",a:"Όχι ακόμα, αλλά το σχεδιάζω!",ap:"ochi akoma, ala to schedjazo",at:"Jeszcze nie, ale planuję!"}
+    ]},
+    react:{title:"Reakcje",phrases:[
+      {q:"Τέλεια!",qp:"telia",qt:"Świetnie!",a:"Ναι, πράγματι!",ap:"ne, pragmati",at:"Tak, rzeczywiście!"},
+      {q:"Αλήθεια;",qp:"alithja",qt:"Naprawdę?",a:"Ναι, σοβαρά!",ap:"ne, sovara",at:"Tak, serio!"},
+      {q:"Πολύ ωραίο!",qp:"poli oreo",qt:"Bardzo fajne!",a:"Χαίρομαι που σου αρέσει!",ap:"cherome pu su aresi",at:"Cieszę się, że ci się podoba!"},
+      {q:"Συμφωνώ!",qp:"simfono",qt:"Zgadzam się!",a:"Κι εγώ το ίδιο σκέφτομαι.",ap:"ki ego to idio skeftome",at:"Ja też tak myślę."},
+      {q:"Τι κρίμα!",qp:"ti krima",qt:"Szkoda!",a:"Ναι, ήταν κρίμα.",ap:"ne, itan krima",at:"Tak, szkoda było."},
+      {q:"Εντυπωσιακό!",qp:"endipjosiako",qt:"Imponujące!",a:"Σε εντυπωσιάζει;",ap:"se endipjosjazi",at:"Robi na tobie wrażenie?"},
+      {q:"Δεν το πιστεύω!",qp:"den to pistevo",qt:"Nie wierzę!",a:"Έτσι είναι, αλήθεια!",ap:"etsi ine, alithja",at:"Tak jest, naprawdę!"},
+      {q:"Πόσο ενδιαφέρον!",qp:"poso endjaferontros",qt:"Jakie interesujące!",a:"Ναι, είναι πολύ ενδιαφέρον.",ap:"ne, ine poli endjaferontros",at:"Tak, to bardzo interesujące."},
+      {q:"Τι σύμπτωση!",qp:"ti simptosi",qt:"Co za zbieg okoliczności!",a:"Ναι, απίστευτο!",ap:"ne, apistevto",at:"Tak, niesamowite!"},
+      {q:"Μου αρέσει πολύ!",qp:"mu aresi poli",qt:"Bardzo mi się podoba!",a:"Χαίρομαι!",ap:"cherome",at:"Cieszę się!"},
+      {q:"Είσαι σοβαρός;",qp:"ise sovjaros",qt:"Mówisz poważnie?",a:"Ναι, εντελώς σοβαρά!",ap:"ne, endelos sovara",at:"Tak, całkowicie poważnie!"},
+      {q:"Πώς είναι δυνατόν;",qp:"pos ine dinaton",qt:"Jak to możliwe?",a:"Ούτε κι εγώ το καταλαβαίνω!",ap:"ute ki ego to katalaveno",at:"Sam tego nie rozumiem!"},
+      {q:"Αυτό είναι τρελό!",qp:"afto ine trelo",qt:"To jest szalone!",a:"Ξέρω, απίστευτο!",ap:"ksero, apistevto",at:"Wiem, niesamowite!"},
+      {q:"Έχεις δίκιο!",qp:"echis dikjo",qt:"Masz rację!",a:"Ευχαριστώ, το εκτιμώ.",ap:"efcharisto, to ektimo",at:"Dziękuję, doceniam to."},
+      {q:"Καλή ιδέα!",qp:"kali idea",qt:"Dobry pomysł!",a:"Χαίρομαι που σου αρέσει!",ap:"cherome pu su aresi",at:"Cieszę się, że ci się podoba!"},
+      {q:"Η προσωπικότητά σου με εντυπωσιάζει!",qp:"i prosopikotita su me endipjosjazi",qt:"Twoja osobowość robi na mnie wrażenie!",a:"Ευχαριστώ πολύ, αυτό με κάνει χαρούμενο!",ap:"efcharisto poli, afto me kani charumeno",at:"Dziękuję bardzo, to mnie cieszy!"}
+    ]},
+    past:{title:"Przeszłość",phrases:[
+      {q:"Τι έκανες το σαββατοκύριακο;",qp:"ti ekanes to savatokiriako",qt:"Co robiłeś w weekend?",a:"Έπαιξα βιντεοπαιχνίδια και παρακολούθησα σειρές.",ap:"epeksa videopechnidja ke parakoluthisa sires",at:"Grałem w gry i oglądałem seriale."},
+      {q:"Πού ταξίδεψες πρόσφατα;",qp:"pu taksidefses prosfata",qt:"Gdzie ostatnio podróżowałeś?",a:"Ήμουν στην Ισπανία τον περασμένο μήνα.",ap:"imun stin Ispania ton perasmeno mina",at:"Byłem w Hiszpanii w zeszłym miesiącu."},
+      {q:"Τι σπούδασες;",qp:"ti spudases",qt:"Co studiowałeś?",a:"Δεν σπούδασα, ξεκίνησα να δουλεύω νωρίς.",ap:"den spudasa, ksinisa na dulevo noris",at:"Nie studiowałem, zacząłem pracować wcześnie."},
+      {q:"Πού μεγάλωσες;",qp:"pu megaloses",qt:"Gdzie dorastałeś?",a:"Στη Γκντύνια, μια πόλη κοντά στη θάλασσα.",ap:"sti Gdinia, mia poli konda sti thalasa",at:"W Gdyni, mieście blisko morza."},
+      {q:"Ποιο ήταν το καλύτερο ταξίδι σου;",qp:"pjo itan to kalitero taksidi su",qt:"Jaka była twoja najlepsza podróż?",a:"Η Ισπανία — έχω πάει τρεις φορές!",ap:"i Ispania — echo pai tris fores",at:"Hiszpania — byłem tam trzy razy!"},
+      {q:"Τι γλώσσες έχεις μάθει;",qp:"ti gloses echis mathi",qt:"Jakich języków się nauczyłeś?",a:"Ισπανικά, γερμανικά, γαλλικά, ρωσικά και ιταλικά.",ap:"ispaniko, yermanika, yalika, rosika ke italika",at:"Hiszpańskiego, niemieckiego, francuskiego, rosyjskiego i włoskiego."},
+      {q:"Τι έκανες χθες;",qp:"ti ekanes chthes",qt:"Co robiłeś wczoraj?",a:"Δούλεψα και μετά πήγα γυμναστήριο.",ap:"dulefsa ke meta piga gimnastirio",at:"Pracowałem, a potem poszedłem na siłownię."},
+      {q:"Πότε ήρθες εδώ;",qp:"pote irthes edo",qt:"Kiedy tu przyjechałeś?",a:"Ήρθα πρόσφατα, για λίγες μέρες.",ap:"irtha prosfata, gia likes meres",at:"Przyjechałem niedawno, na kilka dni."},
+      {q:"Τι σου άρεσε περισσότερο;",qp:"ti su arese perisotero",qt:"Co podobało ci się najbardziej?",a:"Η κουζίνα και οι άνθρωποι.",ap:"i kuzina ke i anthropi",at:"Kuchnia i ludzie."},
+      {q:"Γνώρισες ενδιαφέροντες ανθρώπους;",qp:"gnorisez endjafjerondes anthropus",qt:"Poznałeś ciekawych ludzi?",a:"Ναι, πολλούς! Αυτό είναι το καλύτερο στα ταξίδια.",ap:"ne, polus! afto ine to kalitero sta taksidia",at:"Tak, wielu! To najlepsze w podróżowaniu."},
+      {q:"Είχες κάποιο αστείο περιστατικό;",qp:"iches kapjo astio peristastiko",qt:"Miałeś jakieś śmieszne zdarzenie?",a:"Ναι, χάθηκα μια φορά σε ξένη πόλη!",ap:"ne, chathika mia fora se kseni poli",at:"Tak, raz zgubiłem się w obcym mieście!"}
+    ]},
+    future:{title:"Przyszłość",phrases:[
+      {q:"Τι σχέδια έχεις;",qp:"ti schedia echis",qt:"Jakie masz plany?",a:"Θέλω να συνεχίσω να ταξιδεύω και να μαθαίνω γλώσσες.",ap:"thelo na sinechiso na taksidevo ke na matheno gloses",at:"Chcę kontynuować podróżowanie i naukę języków."},
+      {q:"Θέλεις να ζήσεις στο εξωτερικό;",qp:"thelis na zisis sto eksoteriko",qt:"Chcesz mieszkać za granicą?",a:"Ίσως για λίγο καιρό, ναι.",ap:"isos gia ligo kero, ne",at:"Może przez jakiś czas, tak."},
+      {q:"Σκοπεύω να...",qp:"skopevo na",qt:"Mam zamiar...",a:"Σκοπεύω να επισκεφτώ την Ελλάδα φέτος.",ap:"skopevo na episkepto tin Elada fetos",at:"Mam zamiar odwiedzić Grecję w tym roku."},
+      {q:"Ποια είναι τα σχέδιά σου;",qp:"pja ine ta schedja su",qt:"Jakie są twoje plany?",a:"Να ταξιδέψω σε νέες χώρες και να μάθω νέες γλώσσες.",ap:"na taksidefso se nees chores ke na matho nees gloses",at:"Podróżować do nowych krajów i uczyć się nowych języków."},
+      {q:"Τι θα κάνεις αύριο;",qp:"ti tha kanis avrio",qt:"Co będziesz robić jutro?",a:"Θα πάω στη δουλειά και μετά γυμναστήριο.",ap:"tha pao sti dulja ke meta gimnastirio",at:"Pójdę do pracy, a potem na siłownię."},
+      {q:"Πού θα πας διακοπές;",qp:"pu tha pas diakopes",qt:"Gdzie pojedziesz na wakacje?",a:"Σκέφτομαι να πάω στην Ασία φέτος.",ap:"skeftome na pao stin Asia fetos",at:"Myślę o wyjeździe do Azji w tym roku."},
+      {q:"Ποια γλώσσα θα μάθεις μετά;",qp:"pja glosa tha mathis meta",qt:"Jakiego języka nauczysz się następnego?",a:"Σκέφτομαι ιαπωνικά ή κορεατικά.",ap:"skeftome japonika i koreatika",at:"Myślę o japońskim lub koreańskim."}
+    ]},
+    numbers:{title:"Liczby i czas",phrases:[
+      {q:"Τι ώρα είναι;",qp:"ti ora ine",qt:"Która jest godzina?",a:"Είναι τρεις και μισή. / Είναι μία ακριβώς.",ap:"ine tris ke misi / ine mia akripos",at:"Jest wpół do czwartej. / Jest dokładnie pierwsza."},
+      {q:"Τι μέρα είναι σήμερα;",qp:"ti mera ine simera",qt:"Jaki mamy dziś dzień?",a:"Σήμερα είναι Δευτέρα / Τρίτη / Τετάρτη...",ap:"simera ine Deftera / Triti / Tetarti",at:"Dziś jest poniedziałek / wtorek / środa..."},
+      {q:"Οι μέρες της εβδομάδας",qp:"i meres tis evdomadas",qt:"Dni tygodnia",a:"Δευτέρα, Τρίτη, Τετάρτη, Πέμπτη, Παρασκευή, Σάββατο, Κυριακή",ap:"Deftera, Triti, Tetarti, Pempti, Paraskefi, Savato, Kiriaki",at:"Poniedziałek, wtorek, środa, czwartek, piątek, sobota, niedziela"},
+      {q:"Πόσο κάνει;",qp:"poso kani",qt:"Ile kosztuje?",a:"Πόσο κάνει αυτό; — Κάνει δέκα ευρώ.",ap:"poso kani afto — kani deka evro",at:"Ile to kosztuje? — Kosztuje dziesięć euro."},
+      {q:"Οι μήνες του χρόνου",qp:"i mines tu chonu",qt:"Miesiące roku",a:"Ιανουάριος, Φεβρουάριος, Μάρτιος, Απρίλιος, Μάιος, Ιούνιος...",ap:"Janvarios, Fevrvarios, Martios, Aprilios, Maios, Junios",at:"Styczeń, luty, marzec, kwiecień, maj, czerwiec..."},
+      {q:"Αριθμοί: 1-20",qp:"arithmi 1-20",qt:"Liczby: 1-20",a:"Ένα, δύο, τρία, τέσσερα, πέντε, έξι, επτά, οκτώ, εννέα, δέκα, έντεκα, δώδεκα, δεκατρία, δεκατέσσερα, δεκαπέντε, δεκαέξι, δεκαεπτά, δεκαοκτώ, δεκαεννέα, είκοσι",ap:"ena, dio, tria, tesera, pende, eksi, epta, okto, enea, deka, endeka, dodeka, dekatria, dekazesera, dekapende, dekaeksi, dekaepta, dekaokto, dekaenea, ikosi",at:"Jeden, dwa, trzy, cztery, pięć, sześć, siedem, osiem, dziewięć, dziesięć, jedenaście, dwanaście, trzynaście, czternaście, piętnaście, szesnaście, siedemnaście, osiemnaście, dziewiętnaście, dwadzieścia"},
+      {q:"Αριθμοί: 30-100",qp:"arithmi 30-100",qt:"Liczby: 30-100",a:"Τριάντα (30), σαράντα (40), πενήντα (50), εξήντα (60), εβδομήντα (70), ογδόντα (80), ενενήντα (90), εκατό (100)",ap:"trianda, saranda, peninda, eksinda, evdominda, ogdonda, eneninda, ekato",at:"Trzydzieści, czterdzieści, pięćdziesiąt, sześćdziesiąt, siedemdziesiąt, osiemdziesiąt, dziewięćdziesiąt, sto"},
+      {q:"Πόσο καιρό είσαι εδώ;",qp:"poso kero ise edo",qt:"Jak długo tu jesteś?",a:"Είμαι εδώ μια εβδομάδα. Εσύ;",ap:"ime edo mia evdomada. esi",at:"Jestem tu tydzień. A ty?"}
+    ]},
+    slang:{title:"Slang",phrases:[
+      {q:"Τι γίνεται;",qp:"ti jinete",qt:"Co słychać?",a:"Όλα καλά! Εσύ;",ap:"ola kala! esi",at:"Wszystko dobrze! A ty?"},
+      {q:"Ρε φίλε!",qp:"re file",qt:"Hej stary!",a:"Ρε! Πώς πάει;",ap:"re! pos pai",at:"Hej! Jak leci?"},
+      {q:"Έχει γούστο!",qp:"echi gusto",qt:"Jest fajnie!",a:"Ναι, πολύ γούστο!",ap:"ne, poli gusto",at:"Tak, bardzo fajnie!"},
+      {q:"Αδερφέ!",qp:"aderfe",qt:"Bracie!",a:"Ναι, τι έγινε;",ap:"ne, ti ejine",at:"Tak, co się stało?"},
+      {q:"Άντε!",qp:"ande",qt:"No już!",a:"Άντε, πάμε!",ap:"ande, pame",at:"No chodź, idziemy!"},
+      {q:"Μαλακία!",qp:"malakia",qt:"Bzdury!",a:"Ναι, καθαρή μαλακία!",ap:"ne, kathari malakia",at:"Tak, totalne bzdury!"},
+      {q:"Τρελός είσαι;",qp:"trelos ise",qt:"Czy ty zwariowałeś?",a:"Λίγο, ναι!",ap:"ligo, ne",at:"Trochę, tak!"},
+      {q:"Όλα ρολόι!",qp:"ola roloi",qt:"Wszystko gra!",a:"Ναι, ρολόι!",ap:"ne, roloi",at:"Tak, wszystko gra!"},
+      {q:"Γεια σου ρε!",qp:"ja su re",qt:"Nara!",a:"Γεια! Τα λέμε!",ap:"ja! ta leme",at:"Nara! Do zobaczenia!"},
+      {q:"Παλιόπαιδο!",qp:"paliopedo",qt:"Ty łobuzie!",a:"Χαχαχα! Έτσι είμαι!",ap:"chachacza! etsi ime",at:"Hahaha! Taki już jestem!"}
+    ]},
+    mistakes:{title:"Nieporozumienia",phrases:[
+      {q:"Δεν καταλαβαίνω.",qp:"den katalaveno",qt:"Nie rozumiem.",a:"Μπορείς να μου το εξηγήσεις;",ap:"boris na mu to eksigisis",at:"Możesz mi to wyjaśnić?"},
+      {q:"Μπορείς να μιλάς πιο αργά;",qp:"boris na milas pjo arga",qt:"Możesz mówić wolniej?",a:"Ναι, συγγνώμη! Έτσι;",ap:"ne, signomi! etsi",at:"Tak, przepraszam! Tak?"},
+      {q:"Πώς λέγεται αυτό στα ελληνικά;",qp:"pos legete afto sta elinika",qt:"Jak to się mówi po grecku?",a:"Περίμενε, θα σου πω...",ap:"perimene, tha su po",at:"Chwila, powiem ci..."},
+      {q:"Έκανα λάθος.",qp:"ekana lathos",qt:"Popełniłem błąd.",a:"Δεν πειράζει! Μαθαίνουμε έτσι.",ap:"den pirazi! mathenume etsi",at:"Nic się nie stało! Tak się uczymy."},
+      {q:"Μπορείς να το γράψεις;",qp:"boris na to grapsis",qt:"Możesz to napisać?",a:"Φυσικά, μια στιγμή.",ap:"fisika, mia stigmi",at:"Oczywiście, chwilę."},
+      {q:"Δεν ξέρω πώς να το πω.",qp:"den ksero pos na to po",qt:"Nie wiem jak to powiedzieć.",a:"Μην ανησυχείς, προσπάθησε!",ap:"min anisichis, prospathise",at:"Nie martw się, spróbuj!"},
+      {q:"Τι εννοείς;",qp:"ti enois",qt:"Co masz na myśli?",a:"Εξήγησέ μου λίγο περισσότερο.",ap:"eksigise mu ligo perisotero",at:"Wyjaśnij mi trochę więcej."},
+      {q:"Συγγνώμη, δεν άκουσα.",qp:"signomi, den akusa",qt:"Przepraszam, nie słyszałem.",a:"Δεν πειράζει, το επαναλαμβάνω.",ap:"den pirazi, to epanalamvano",at:"Nic się nie stało, powtórzę."}
+    ]},
+    work:{title:"Praca — Steward",phrases:[
+      {q:"Καλώς ορίσατε στην πτήση μας!",qp:"kalos orjisate stin ptisi mas",qt:"Witamy na pokładzie!",a:"Χαίρομαι που είστε μαζί μας σήμερα.",ap:"cherome pu iste mazi mas simera",at:"Cieszę się, że jesteście z nami dzisiaj."},
+      {q:"Παρακαλώ δέστε τη ζώνη ασφαλείας.",qp:"parakalo deste ti zoni asfaljas",qt:"Prosimy zapiąć pasy.",a:"Ευχαριστώ για τη συνεργασία σας.",ap:"efcharisto gia ti sinergasja sas",at:"Dziękujemy za współpracę."},
+      {q:"Θέλετε κάτι να πιείτε;",qp:"thelete kati na pjite",qt:"Coś do picia?",a:"Έχουμε νερό, χυμό, αναψυκτικά και καφέ.",ap:"echume nero, chimo, anapsiktika ke kafe",at:"Mamy wodę, sok, napoje i kawę."},
+      {q:"Θέλετε κάτι να φάτε;",qp:"thelete kati na fate",qt:"Coś do jedzenia?",a:"Θα σας φέρω το μενού.",ap:"tha sas fero to menu",at:"Przyniosę wam menu."},
+      {q:"Χρειάζεστε βοήθεια με τις αποσκευές;",qp:"chriazeste voithia me tis aposkeves",qt:"Pomoc z bagażem?",a:"Αφήστε με να σας βοηθήσω.",ap:"afiste me na sas voithiso",at:"Pozwólcie, że wam pomogę."},
+      {q:"Παρακαλώ απενεργοποιήστε τις ηλεκτρονικές συσκευές.",qp:"parakalo apergopoijste tis elektronikes siskeves",qt:"Prosimy wyłączyć urządzenia elektroniczne.",a:"Ευχαριστούμε για την κατανόησή σας.",ap:"efcharistume gia tin kataroisi sas",at:"Dziękujemy za zrozumienie."},
+      {q:"Είστε καλά; Μπορώ να βοηθήσω;",qp:"iste kala? boro na voithiso",qt:"Wszystko dobrze?",a:"Είμαι εδώ για να σας εξυπηρετήσω.",ap:"ime edo gia na sas eksipireiso",at:"Jestem tutaj, żeby wam służyć."},
+      {q:"Καλή σας άφιξη!",qp:"kali sas afiksi",qt:"Miłego przybycia!",a:"Ελπίζω να είχατε ένα ευχάριστο ταξίδι.",ap:"elpizo na ichate ena efcharisto taksidi",at:"Mam nadzieję, że mieliście przyjemną podróż."},
+      {q:"Σας ευχαριστούμε που επιλέξατε την πτήση μας.",qp:"sas efcharistume pu epileksate tin ptisi mas",qt:"Dziękujemy za wybranie naszego lotu.",a:"Ελπίζουμε να σας δούμε ξανά σύντομα!",ap:"elpizoume na sas dume ksana sindoma",at:"Mamy nadzieję zobaczyć was znowu wkrótce!"}
+    ]},
+    bye:{title:"Pożegnanie",phrases:[
+      {q:"Αντίο!",qp:"andio",qt:"Do widzenia!",a:"Αντίο! Καλό ταξίδι!",ap:"andio! kalo taksidi",at:"Do widzenia! Dobrej podróży!"},
+      {q:"Τα λέμε!",qp:"ta leme",qt:"Do zobaczenia!",a:"Ναι, τα λέμε σύντομα!",ap:"ne, ta leme sindoma",at:"Tak, do zobaczenia wkrótce!"},
+      {q:"Ήταν χαρά μου να σε γνωρίσω!",qp:"itan chara mu na se gnorisso",qt:"Miło cię było poznać!",a:"Κι εγώ! Τα λέμε!",ap:"ki ego! ta leme",at:"Wzajemnie! Do zobaczenia!"},
+      {q:"Καλό βράδυ!",qp:"kalo vradi",qt:"Dobranoc!",a:"Και σε σένα! Καλή νύχτα!",ap:"ke se sena! kali nichta",at:"Wzajemnie! Dobranoc!"},
+      {q:"Ήταν υπέροχο να μιλήσω μαζί σου!",qp:"itan iperacho na miliso mazi su",qt:"Świetnie było z tobą porozmawiać!",a:"Κι εγώ! Μέχρι την επόμενη φορά!",ap:"ki ego! mechri tin epomeni fora",at:"Wzajemnie! Do następnego razu!"}
+    ]}
+  }},
+  ja:{color:"#dc2626",flag:"🇯🇵",name:"Japoński",categories:{
+    greet:{title:"Powitanie",phrases:[
+      {q:"こんにちは！元気ですか？",qp:"konnichiwa! genki desu ka",qt:"Cześć! Jak się masz?",a:"元気です、ありがとう！あなたは？",ap:"genki desu, arigatou! anata wa",at:"Dobrze, dziękuję! A ty?"},
+      {q:"お名前は何ですか？",qp:"onamae wa nan desu ka",qt:"Jak masz na imię?",a:"カスペルです。あなたは？",ap:"Kasuperu desu. anata wa",at:"Jestem Kacper. A ty?"},
+      {q:"どこから来ましたか？",qp:"doko kara kimashita ka",qt:"Skąd jesteś?",a:"ポーランドのグディニャから来ました。あなたは？",ap:"Poorando no Gudinia kara kimashita. anata wa",at:"Jestem z Gdyni w Polsce. A ty?"},
+      {q:"何歳ですか？",qp:"nansai desu ka",qt:"Ile masz lat?",a:"27歳です。あなたは？",ap:"nijushichi sai desu. anata wa",at:"Mam 27 lat. A ty?",v:["25歳です。– Mam 25 lat.","30歳です。– Mam 30 lat.","年齢には見えないと言われます！– Mówią, że nie wyglądam na swój wiek!"]},
+      {q:"ここの人ですか？",qp:"koko no hito desu ka",qt:"Jesteś stąd?",a:"いいえ、ポーランドから来ました。あなたは？",ap:"iie, Poorando kara kimashita. anata wa",at:"Nie, jestem z Polski. A ty skąd jesteś?"}
+    ]},
+    info:{title:"Kim jestem",phrases:[
+      {q:"お仕事は何ですか？",qp:"oshigoto wa nan desu ka",qt:"Czym się zajmujesz?",a:"港で働いています。トレーディングが趣味です。43カ国に行って、5つの言語を勉強しています。あなたは？",ap:"minato de hataraite imasu. toreeding ga shumi desu. yonjuusan kakoku ni itte, itsutsu no gengo o benkyou shite imasu. anata wa",at:"Pracuję w porcie. Trading to moje hobby. Byłem w 43 krajach i uczę się 5 języków. A ty?"},
+      {q:"働いていますか、それとも学生ですか？",qp:"hataraite imasu ka, soretomo gakusei desu ka",qt:"Pracujesz czy studiujesz?",a:"働いています。あなたは？",ap:"hataraite imasu. anata wa",at:"Pracuję. A ty?"},
+      {q:"どこに住んでいますか？",qp:"doko ni sunde imasu ka",qt:"Gdzie dokładnie mieszkasz?",a:"グダニスクの近くのグディニャに住んでいます。",ap:"Gudanisuku no chikaku no Gudinia ni sunde imasu",at:"Mieszkam w Gdyni, blisko Gdańska."},
+      {q:"兄弟はいますか？",qp:"kyoudai wa imasu ka",qt:"Masz rodzeństwo?",a:"はい、妹がいます。あなたは？",ap:"hai, imouto ga imasu. anata wa",at:"Tak, mam siostrę. A ty?"},
+      {q:"外国に住んだことはありますか？",qp:"gaikoku ni sunda koto wa arimasu ka",qt:"Mieszkałeś w innym kraju?",a:"いいえ、でもたくさん旅行しました。あなたは？",ap:"iie, demo takusan ryokou shimashita. anata wa",at:"Nie, ale dużo podróżowałem. A ty?"}
+    ]},
+    hobby:{title:"Hobby",phrases:[
+      {q:"趣味は何ですか？",qp:"shumi wa nan desu ka",qt:"Co robisz w wolnym czasie?",a:"ビデオゲームをして、ドラマを見て、ジムに行きます。",ap:"bideo geemu o shite, dorama o mite, jimu ni ikimasu",at:"Gram w gry video, oglądam seriale i chodzę na siłownię."},
+      {q:"スポーツをしますか？",qp:"supootsu o shimasu ka",qt:"Uprawiasz jakiś sport?",a:"はい、定期的にジムに行きます。あなたは？",ap:"hai, teikiteki ni jimu ni ikimasu. anata wa",at:"Tak, regularnie chodzę na siłownię. A ty?"},
+      {q:"どんな音楽が好きですか？",qp:"donna ongaku ga suki desu ka",qt:"Jakiej muzyki słuchasz?",a:"ラップ、ポップ、ロックが好きです。あなたは？",ap:"rappu, poppu, rokku ga suki desu. anata wa",at:"Lubię rap, pop i rock. A ty?"},
+      {q:"旅行は好きですか？",qp:"ryokou wa suki desu ka",qt:"Lubisz podróżować?",a:"はい、とても！43カ国に行きました。",ap:"hai, totemo! yonjuusan kakoku ni ikimashita",at:"Tak, bardzo! Byłem w 43 krajach."},
+      {q:"どんなドラマを見ますか？",qp:"donna dorama o mimasu ka",qt:"Jakie seriale oglądasz?",a:"NetflixやHBOのドラマを見ます。あなたは？",ap:"Nettofurikkusu ya HBO no dorama o mimasu. anata wa",at:"Oglądam seriale na Netflixie i HBO. A ty?"},
+      {q:"ビデオゲームをしますか？",qp:"bideo geemu o shimasu ka",qt:"Grasz w gry video?",a:"はい、たくさん！主にPCで。",ap:"hai, takusan! omo ni piishii de",at:"Tak, dużo! Głównie na PC."}
+    ]},
+    why:{title:"Dlaczego uczę się",phrases:[
+      {q:"なぜ日本語を勉強していますか？",qp:"naze nihongo o benkyou shite imasu ka",qt:"Dlaczego uczysz się japońskiego?",a:"日本の文化と旅行のために勉強しています。",ap:"nihon no bunka to ryokou no tame ni benkyou shite imasu",at:"Uczę się ze względu na kulturę japońską i podróże."},
+      {q:"どのくらい日本語を勉強していますか？",qp:"dono kurai nihongo o benkyou shite imasu ka",qt:"Jak długo uczysz się japońskiego?",a:"数週間です。始めたばかりです。",ap:"suu shuukan desu. hajimeta bakari desu",at:"Kilka tygodni. Właśnie zacząłem."},
+      {q:"どうやって言語を勉強していますか？",qp:"douyatte gengo o benkyou shite imasu ka",qt:"Jak uczysz się języka?",a:"アプリ、動画、ネイティブスピーカーとの会話で勉強しています。",ap:"apuri, douga, neitibu supiikaa to no kaiwa de benkyou shite imasu",at:"Przez aplikacje, filmy i z native speakerami."},
+      {q:"日本に行きたいですか？",qp:"nihon ni ikitai desu ka",qt:"Chcesz pojechać do Japonii?",a:"はい、とても！東京と京都に行きたいです。",ap:"hai, totemo! Tookyoo to Kyooto ni ikitai desu",at:"Tak, bardzo! Tokio i Kioto."},
+      {q:"他の言語も勉強していますか？",qp:"hoka no gengo mo benkyou shite imasu ka",qt:"Uczysz się też innych języków?",a:"はい、合計5つの言語を勉強しています。",ap:"hai, goukei itsutsu no gengo o benkyou shite imasu",at:"Tak, pięciu języków łącznie."},
+      {q:"日本語は難しいですか？",qp:"nihongo wa muzukashii desu ka",qt:"Czy japoński jest trudny?",a:"文字システムが一番難しいです！",ap:"moji shisutemu ga ichiban muzukashii desu",at:"System pisma jest najtrudniejszy!"},
+      {q:"日本語はどうですか？",qp:"nihongo wa dou desu ka",qt:"Jak idzie ci japoński?",a:"少ししか話せません。毎日勉強しています。",ap:"sukoshi shika hanasemasen. mainichi benkyou shite imasu",at:"Tylko trochę gadam po japońsku. Uczę się codziennie."}
+    ]},
+    travel:{title:"Podróże",phrases:[
+      {q:"たくさん旅行しましたか？",qp:"takusan ryokou shimashita ka",qt:"Dużo podróżowałeś?",a:"はい、43カ国に行きました。あなたは？",ap:"hai, yonjuusan kakoku ni ikimashita. anata wa",at:"Tak, byłem w 43 krajach. A ty?"},
+      {q:"一番好きな国はどこですか？",qp:"ichiban suki na kuni wa doko desu ka",qt:"Który kraj podobał ci się najbardziej?",a:"スペインが素晴らしかったです！3回行きました。",ap:"Supein ga subarashikatta desu! sankai ikimashita",at:"Hiszpania! Byłem tam trzy razy."},
+      {q:"もっと旅行したいですか？",qp:"motto ryokou shitai desu ka",qt:"Chcesz więcej podróżować?",a:"はい、全ての国に行きたいです！",ap:"hai, subete no kuni ni ikitai desu",at:"Tak, chcę odwiedzić wszystkie kraje!"},
+      {q:"どの国に行きたいですか？",qp:"dono kuni ni ikitai desu ka",qt:"Który kraj chcesz odwiedzić?",a:"日本と韓国に行きたいです。",ap:"Nihon to Kankoku ni ikitai desu",at:"Japonię i Koreę."},
+      {q:"旅行中はどこに泊まりますか？",qp:"ryokou chuu wa doko ni tomarimasu ka",qt:"Gdzie mieszkasz gdy podróżujesz?",a:"たいていホテルかAirbnbに泊まります。",ap:"taitei hoteru ka Airbnb ni tomarimasu",at:"Zazwyczaj w hotelach lub Airbnb."},
+      {q:"一人で旅行しますか？",qp:"hitori de ryokou shimasu ka",qt:"Podróżujesz sam?",a:"よく一人で、でも友達とも行きます。",ap:"yoku hitori de, demo tomodachi to mo ikimasu",at:"Często sam, ale też z przyjaciółmi."},
+      {q:"お気に入りの場所はどこですか？",qp:"okiniiri no basho wa doko desu ka",qt:"Twoje ulubione miejsce?",a:"バルセロナが素晴らしかったです。",ap:"Baruseronaa ga subarashikatta desu",at:"Barcelona była niesamowita."},
+      {q:"どのくらい旅行しますか？",qp:"dono kurai ryokou shimasu ka",qt:"Jak długo podróżujesz?",a:"たいてい毎回1〜2週間旅行します。",ap:"taitei maikai ichi ni shuukan ryokou shimasu",at:"Zazwyczaj tydzień-dwa za każdym razem."},
+      {q:"日本に来たことはありますか？",qp:"nihon ni kita koto wa arimasu ka",qt:"Byłeś kiedyś w Japonii?",a:"まだです、でも計画しています！",ap:"mada desu, demo keikaku shite imasu",at:"Jeszcze nie, ale planuję!"}
+    ]},
+    react:{title:"Reakcje",phrases:[
+      {q:"すごい！",qp:"sugoi",qt:"Niesamowite!",a:"本当にそうですね！",ap:"hontou ni sou desu ne",at:"Naprawdę tak!"},
+      {q:"本当に？",qp:"hontou ni",qt:"Naprawdę?",a:"はい、本当です！",ap:"hai, hontou desu",at:"Tak, naprawdę!"},
+      {q:"いいですね！",qp:"ii desu ne",qt:"Świetnie!",a:"気に入ってくれてよかったです！",ap:"ki ni itte kurete yokatta desu",at:"Cieszę się, że ci się podoba!"},
+      {q:"同感です！",qp:"doukandesu",qt:"Zgadzam się!",a:"私も同じことを思っています。",ap:"watashi mo onaji koto o omotte imasu",at:"Ja też tak myślę."},
+      {q:"残念！",qp:"zannen",qt:"Szkoda!",a:"はい、残念でしたね。",ap:"hai, zannen deshita ne",at:"Tak, szkoda było."},
+      {q:"印象的！",qp:"inshouteki",qt:"Imponujące!",a:"感銘を受けましたか？",ap:"kanmei o ukemashita ka",at:"Robi na tobie wrażenie?"},
+      {q:"信じられない！",qp:"shinjirarenai",qt:"Nie wierzę!",a:"本当のことですよ！",ap:"hontou no koto desu yo",at:"Naprawdę!"},
+      {q:"面白い！",qp:"omoshiroi",qt:"Interesujące!",a:"はい、とても面白いです。",ap:"hai, totemo omoshiroi desu",at:"Tak, bardzo interesujące."},
+      {q:"なんという偶然！",qp:"nan to iu guuzen",qt:"Co za zbieg okoliczności!",a:"はい、信じられない！",ap:"hai, shinjirarenai",at:"Niesamowite!"},
+      {q:"とても気に入りました！",qp:"totemo ki ni irimashita",qt:"Bardzo mi się podoba!",a:"よかった！",ap:"yokatta",at:"Cieszę się!"},
+      {q:"本気ですか？",qp:"honki desu ka",qt:"Mówisz poważnie?",a:"はい、本気です！",ap:"hai, honki desu",at:"Tak, poważnie!"},
+      {q:"どうしてそんなことが？",qp:"doushite sonna koto ga",qt:"Jak to możliwe?",a:"私にもわかりません！",ap:"watashi ni mo wakarimasen",at:"Sam tego nie rozumiem!"},
+      {q:"それは狂ってる！",qp:"sore wa kurutte ru",qt:"To szalone!",a:"そうですね、信じられない！",ap:"sou desu ne, shinjirarenai",at:"Wiem, niesamowite!"},
+      {q:"あなたは正しい！",qp:"anata wa tadashii",qt:"Masz rację!",a:"ありがとう、嬉しいです。",ap:"arigatou, ureshii desu",at:"Dziękuję, doceniam."},
+      {q:"いいアイデア！",qp:"ii aidea",qt:"Dobry pomysł!",a:"気に入ってくれてよかった！",ap:"ki ni itte kurete yokatta",at:"Cieszę się!"},
+      {q:"あなたの個性に感銘を受けました！",qp:"anata no kosei ni kanmei o ukemashita",qt:"Twoja osobowość robi wrażenie!",a:"ありがとう、それは嬉しいです！",ap:"arigatou, sore wa ureshii desu",at:"Dziękuję, to mnie cieszy!"}
+    ]},
+    past:{title:"Przeszłość",phrases:[
+      {q:"週末は何をしましたか？",qp:"shuumatsu wa nani o shimashita ka",qt:"Co robiłeś w weekend?",a:"ビデオゲームをして、ドラマを見ました。",ap:"bideo geemu o shite, dorama o mimashita",at:"Grałem w gry i oglądałem seriale."},
+      {q:"最近どこに旅行しましたか？",qp:"saikin doko ni ryokou shimashita ka",qt:"Gdzie ostatnio podróżowałeś?",a:"先月スペインに行きました。",ap:"sengetsu Supein ni ikimashita",at:"Byłem w Hiszpanii w zeszłym miesiącu."},
+      {q:"何を勉強しましたか？",qp:"nani o benkyou shimashita ka",qt:"Co studiowałeś?",a:"大学には行きませんでした。早くから働き始めました。",ap:"daigaku ni wa ikimasen deshita. hayaku kara hataraki hajimemashita",at:"Nie studiowałem, zacząłem pracować wcześnie."},
+      {q:"どこで育ちましたか？",qp:"doko de sodachimashita ka",qt:"Gdzie dorastałeś?",a:"海の近くのグディニャという町で育ちました。",ap:"umi no chikaku no Gudinia to iu machi de sodachimashita",at:"W Gdyni, blisko morza."},
+      {q:"一番いい旅は何でしたか？",qp:"ichiban ii tabi wa nan deshita ka",qt:"Najlepsza podróż?",a:"スペイン — 3回行きました！",ap:"Supein — sankai ikimashita",at:"Hiszpania — byłem tam trzy razy!"},
+      {q:"以前に他の言語を勉強しましたか？",qp:"izen ni hoka no gengo o benkyou shimashita ka",qt:"Uczyłeś się wcześniej języka?",a:"はい、小さい頃から英語を勉強しました。",ap:"hai, chiisai koro kara eigo o benkyou shimashita",at:"Tak, angielski od dziecka."},
+      {q:"昨日は何をしましたか？",qp:"kinou wa nani o shimashita ka",qt:"Co robiłeś wczoraj?",a:"仕事をして、その後ジムに行きました。",ap:"shigoto o shite, sono ato jimu ni ikimashita",at:"Pracowałem, potem siłownia."},
+      {q:"いつここに来ましたか？",qp:"itsu koko ni kimashita ka",qt:"Kiedy tu przyjechałeś?",a:"最近来ました、数日間です。",ap:"saikin kimashita, suujitsu kan desu",at:"Niedawno, na kilka dni."},
+      {q:"旅行で一番よかったことは？",qp:"ryokou de ichiban yokatta koto wa",qt:"Co podobało ci się najbardziej?",a:"食べ物と人々です。",ap:"tabemono to hitobito desu",at:"Kuchnia i ludzie."},
+      {q:"面白い人に会いましたか？",qp:"omoshiroi hito ni aimashita ka",qt:"Poznałeś ciekawych ludzi?",a:"はい、たくさん！それが旅行の一番いいところです。",ap:"hai, takusan! sore ga ryokou no ichiban ii tokoro desu",at:"Tak, wielu! To najlepsze w podróżowaniu."},
+      {q:"面白いエピソードはありましたか？",qp:"omoshiroi episoodo wa arimashita ka",qt:"Śmieszne zdarzenie?",a:"はい、一度知らない町で迷子になりました！",ap:"hai, ichido shiranai machi de maigo ni narimashita",at:"Tak, raz zgubiłem się w obcym mieście!"}
+    ]},
+    future:{title:"Przyszłość",phrases:[
+      {q:"どんな計画がありますか？",qp:"donna keikaku ga arimasu ka",qt:"Jakie masz plany?",a:"旅行と語学学習を続けたいです。",ap:"ryokou to gogaku gakushuu o tsuzuketai desu",at:"Chcę kontynuować podróżowanie i naukę języków."},
+      {q:"海外に住みたいですか？",qp:"kaigai ni sumitai desu ka",qt:"Chcesz mieszkać za granicą?",a:"しばらくは、そうかもしれません。",ap:"shibaraku wa, sou kamo shiremasen",at:"Może przez jakiś czas."},
+      {q:"〜するつもりです",qp:"suru tsumori desu",qt:"Mam zamiar...",a:"今年日本を訪れるつもりです。",ap:"kotoshi Nihon o otozureru tsumori desu",at:"Mam zamiar odwiedzić Japonię w tym roku."},
+      {q:"あなたの計画は何ですか？",qp:"anata no keikaku wa nan desu ka",qt:"Jakie są twoje plany?",a:"新しい国を旅行して、新しい言語を学ぶことです。",ap:"atarashii kuni o ryokou shite, atarashii gengo o manabu koto desu",at:"Podróżować i uczyć się nowych języków."},
+      {q:"明日は何をしますか？",qp:"ashita wa nani o shimasu ka",qt:"Co będziesz robić jutro?",a:"仕事に行って、その後ジムに行きます。",ap:"shigoto ni itte, sono ato jimu ni ikimasu",at:"Praca, potem siłownia."},
+      {q:"どこに休暇に行きますか？",qp:"doko ni kyuuka ni ikimasu ka",qt:"Wakacje?",a:"今年はアジアに行くことを考えています。",ap:"kotoshi wa Ajia ni iku koto o kangaete imasu",at:"Myślę o Azji w tym roku."},
+      {q:"次はどの言語を学びますか？",qp:"tsugi wa dono gengo o manabimasu ka",qt:"Następny język?",a:"韓国語かギリシャ語を考えています。",ap:"Kankokugo ka Girishago o kangaete imasu",at:"Koreański lub grecki."}
+    ]},
+    numbers:{title:"Liczby i czas",phrases:[
+      {q:"今何時ですか？",qp:"ima nanji desu ka",qt:"Która godzina?",a:"3時半です。/ ちょうど1時です。",ap:"sanji han desu / choudo ichiji desu",at:"Wpół do czwartej. / Dokładnie pierwsza."},
+      {q:"今日は何曜日ですか？",qp:"kyou wa nanyoubi desu ka",qt:"Jaki dzień?",a:"今日は月曜日/火曜日/水曜日...",ap:"kyou wa getsuyoubi / kayoubi / suiyoubi",at:"Poniedziałek / wtorek / środa..."},
+      {q:"曜日",qp:"youbi",qt:"Dni tygodnia",a:"月曜日、火曜日、水曜日、木曜日、金曜日、土曜日、日曜日",ap:"getsuyoubi, kayoubi, suiyoubi, mokuyoubi, kin'youbi, doyoubi, nichiyoubi",at:"Pn, Wt, Śr, Cz, Pt, Sb, Nd"},
+      {q:"いくらですか？",qp:"ikura desu ka",qt:"Ile kosztuje?",a:"これはいくらですか？ — 千円です。",ap:"kore wa ikura desu ka — sen en desu",at:"Ile to? — Tysiąc jenów."},
+      {q:"月",qp:"tsuki",qt:"Miesiące",a:"1月、2月、3月、4月、5月、6月、7月、8月、9月、10月、11月、12月",ap:"ichigatsu, nigatsu, sangatsu, shigatsu, gogatsu, rokugatsu...",at:"Styczeń, luty, marzec, kwiecień, maj, czerwiec..."},
+      {q:"数字：1〜20",qp:"suuji: 1-20",qt:"Liczby: 1-20",a:"一、二、三、四、五、六、七、八、九、十、十一、十二、十三、十四、十五、十六、十七、十八、十九、二十",ap:"ichi, ni, san, shi, go, roku, shichi, hachi, ku, juu, juuichi, juuni, juusan, juushi, juugo, juuroku, juushichi, juuhachi, juuku, nijuu",at:"1-20 po japońsku"},
+      {q:"数字：30〜100",qp:"suuji: 30-100",qt:"Liczby: 30-100",a:"三十、四十、五十、六十、七十、八十、九十、百",ap:"sanjuu, shijuu, gojuu, rokujuu, shichijuu, hachijuu, kyuujuu, hyaku",at:"30-100 po japońsku"},
+      {q:"どのくらいここにいますか？",qp:"dono kurai koko ni imasu ka",qt:"Jak długo tu jesteś?",a:"一週間います。あなたは？",ap:"isshuukan imasu. anata wa",at:"Tydzień. A ty?"}
+    ]},
+    slang:{title:"Slang",phrases:[
+      {q:"やばい！",qp:"yabai",qt:"Niesamowite! (slang)",a:"本当にやばいですね！",ap:"hontou ni yabai desu ne",at:"Naprawdę niesamowite!"},
+      {q:"マジで？",qp:"maji de",qt:"Serio?",a:"マジで！信じて！",ap:"maji de! shinjite",at:"Serio! Uwierz mi!"},
+      {q:"ウケる！",qp:"ukeru",qt:"Śmieszne!",a:"本当に笑える！",ap:"hontou ni waraeru",at:"Naprawdę śmieszne!"},
+      {q:"めっちゃ！",qp:"meccha",qt:"Bardzo! (slang)",a:"めっちゃいいじゃん！",ap:"meccha ii jan",at:"Super jest!"},
+      {q:"なんか...",qp:"nanka",qt:"Jakoś... (slang)",a:"なんか、わかる気がする。",ap:"nanka, wakaru ki ga suru",at:"Jakoś to rozumiem."},
+      {q:"きつい！",qp:"kitsui",qt:"Ciężko! (slang)",a:"本当にきつかった！",ap:"hontou ni kitsukatta",at:"Naprawdę ciężko!"},
+      {q:"ありえない！",qp:"arienai",qt:"Niemożliwe!",a:"でも本当のことだよ！",ap:"demo hontou no koto da yo",at:"Ale to prawda!"},
+      {q:"おつかれ！",qp:"otsukare",qt:"Dobra robota! / Nara!",a:"おつかれ！また明日！",ap:"otsukare! mata ashita",at:"Na razie! Do jutra!"},
+      {q:"じゃあね！",qp:"jaa ne",qt:"Na razie!",a:"じゃあ！またね！",ap:"jaa! mata ne",at:"Na razie!"},
+      {q:"最高！",qp:"saikou",qt:"Najlepsze!",a:"本当に最高！",ap:"hontou ni saikou",at:"Naprawdę najlepsze!"}
+    ]},
+    mistakes:{title:"Nieporozumienia",phrases:[
+      {q:"わかりません。",qp:"wakarimasen",qt:"Nie rozumiem.",a:"説明してもらえますか？",ap:"setsumei shite moraemasu ka",at:"Możesz wyjaśnić?"},
+      {q:"もっとゆっくり話してもらえますか？",qp:"motto yukkuri hanashite moraemasu ka",qt:"Wolniej?",a:"はい、すみません！こうですか？",ap:"hai, sumimasen! kou desu ka",at:"Tak, przepraszam!"},
+      {q:"日本語でどう言いますか？",qp:"nihongo de dou iimasu ka",qt:"Jak to po japońsku?",a:"ちょっと待って、教えます...",ap:"chotto matte, oshiemasu",at:"Chwila, powiem ci..."},
+      {q:"間違えました。",qp:"machigaemashita",qt:"Popełniłem błąd.",a:"大丈夫！そうやって学びます。",ap:"daijoubu! sou yatte manabimasu",at:"Nic się nie stało!"},
+      {q:"書いてもらえますか？",qp:"kaite moraemasu ka",qt:"Możesz napisać?",a:"もちろん、少々お待ちください。",ap:"mochiron, shoushou omachi kudasai",at:"Oczywiście."},
+      {q:"どう言えばいいかわかりません。",qp:"dou ieba ii ka wakarimasen",qt:"Nie wiem jak powiedzieć.",a:"心配しないで、試してみて！",ap:"shinpai shinaide, tameshite mite",at:"Nie martw się, spróbuj!"},
+      {q:"どういう意味ですか？",qp:"dou iu imi desu ka",qt:"Co masz na myśli?",a:"もう少し説明してください。",ap:"mou sukoshi setsumei shite kudasai",at:"Wyjaśnij więcej."},
+      {q:"すみません、聞こえませんでした。",qp:"sumimasen, kikoemasen deshita",qt:"Nie słyszałem.",a:"大丈夫、もう一度言います。",ap:"daijoubu, mou ichido iimasu",at:"Nic się nie stało, powtórzę."}
+    ]},
+    work:{title:"Praca — Steward",phrases:[
+      {q:"ご搭乗ありがとうございます！",qp:"gotoujouu arigatou gozaimasu",qt:"Dziękujemy za wejście na pokład!",a:"本日はご搭乗いただきありがとうございます。",ap:"honjitsu wa gotoujouu itadaki arigatou gozaimasu",at:"Dziękujemy za podróż z nami."},
+      {q:"シートベルトをお締めください。",qp:"shiito beruto o oshime kudasai",qt:"Prosimy zapiąć pasy.",a:"ご協力ありがとうございます。",ap:"gokyouryoku arigatou gozaimasu",at:"Dziękujemy za współpracę."},
+      {q:"何かお飲み物はいかがですか？",qp:"nanika onomimono wa ikaga desu ka",qt:"Coś do picia?",a:"お水、ジュース、ソフトドリンク、コーヒーがございます。",ap:"omizu, juusu, sofuto dorinku, koohii ga gozaimasu",at:"Woda, sok, napoje, kawa."},
+      {q:"何かお食事はいかがですか？",qp:"nanika oshokuji wa ikaga desu ka",qt:"Coś do jedzenia?",a:"メニューをお持ちします。",ap:"menyuu o omochi shimasu",at:"Przyniosę menu."},
+      {q:"お荷物のお手伝いが必要ですか？",qp:"onimotsu no otetsudai ga hitsuyou desu ka",qt:"Pomoc z bagażem?",a:"お手伝いさせていただきます。",ap:"otetsudai sasete itadakimasu",at:"Pozwólcie, że pomogę."},
+      {q:"電子機器の電源をお切りください。",qp:"denshi kiki no dengen o okiri kudasai",qt:"Prosimy wyłączyć urządzenia.",a:"ご理解いただきありがとうございます。",ap:"gorikaisharete arigatou gozaimasu",at:"Dziękujemy za zrozumienie."},
+      {q:"お体の具合はいかがですか？",qp:"okarada no guai wa ikaga desu ka",qt:"Wszystko dobrze?",a:"何かお手伝いできることがあればお申し付けください。",ap:"nanika otetsudai dekiru koto ga areba omoushtuke kudasai",at:"Jestem do dyspozycji."},
+      {q:"ご到着おめでとうございます！",qp:"gotouchaku omedetou gozaimasu",qt:"Gratulujemy przybycia!",a:"良いご旅行でしたことを願っております。",ap:"yoi goryokou deshita koto o negate orimasu",at:"Mam nadzieję na przyjemną podróż."},
+      {q:"ご利用いただきありがとうございました。",qp:"goriyou itadaki arigatou gozaimashita",qt:"Dziękujemy za wybranie naszego lotu.",a:"またのご利用をお待ちしております！",ap:"mata no goriyou o omachi shite orimasu",at:"Do zobaczenia!"}
+    ]},
+    bye:{title:"Pożegnanie",phrases:[
+      {q:"さようなら！",qp:"sayounara",qt:"Do widzenia!",a:"さようなら！良い旅を！",ap:"sayounara! yoi tabi o",at:"Do widzenia! Dobrej podróży!"},
+      {q:"またね！",qp:"mata ne",qt:"Do zobaczenia!",a:"はい、またすぐに！",ap:"hai, mata sugu ni",at:"Do zobaczenia wkrótce!"},
+      {q:"会えてよかったです！",qp:"aete yokatta desu",qt:"Miło cię było poznać!",a:"私もです！またね！",ap:"watashi mo desu! mata ne",at:"Wzajemnie!"},
+      {q:"おやすみなさい！",qp:"oyasuminasai",qt:"Dobranoc!",a:"あなたも！良い夢を！",ap:"anata mo! yoi yume o",at:"Wzajemnie! Dobranoc!"},
+      {q:"話せてよかったです！",qp:"hanasete yokatta desu",qt:"Świetnie było rozmawiać!",a:"私もです！またいつか！",ap:"watashi mo desu! mata itsuka",at:"Wzajemnie! Do następnego razu!"}
+    ]}
+  }},
+  ko:{color:"#0284c7",flag:"🇰🇷",name:"Koreański",categories:{
+    greet:{title:"Powitanie",phrases:[
+      {q:"안녕하세요! 어떻게 지내세요?",qp:"annjonghasejo! ottokke czinejejo",qt:"Cześć! Jak się masz?",a:"잘 지내요, 감사해요! 당신은요?",ap:"czal czinejojo, kamsa hejojo! tangsineunjo",at:"Dobrze, dziękuję! A ty?"},
+      {q:"이름이 뭐예요?",qp:"irumi mwojejo",qt:"Jak masz na imię?",a:"카스퍼예요. 당신은요?",ap:"Kasupeo jejo. tangsineunjo",at:"Jestem Kacper. A ty?"},
+      {q:"어디서 오셨어요?",qp:"odiso osjossoejo",qt:"Skąd jesteś?",a:"폴란드 그디니아에서 왔어요. 당신은요?",ap:"Pollandeu Gdinia eso wassoejo. tangsineunjo",at:"Z Gdyni w Polsce. A ty?"},
+      {q:"몇 살이에요?",qp:"mjot sariejo",qt:"Ile masz lat?",a:"스물일곱 살이에요. 당신은요?",ap:"sumul ilgop sariejo. tangsineunjo",at:"27 lat. A ty?",v:["스물다섯 살이에요. – 25 lat.","서른 살이에요. – 30 lat.","나이가 안 들어 보인다는 말을 들어요! – Nie wyglądam na swój wiek!"]},
+      {q:"여기 사람이에요?",qp:"jogi sarami ejo",qt:"Jesteś stąd?",a:"아니요, 폴란드에서 왔어요. 당신은요?",ap:"anijo, Pollandeu eso wassoejo. tangsineunjo",at:"Nie, jestem z Polski. A ty?"}
+    ]},
+    info:{title:"Kim jestem",phrases:[
+      {q:"무슨 일 하세요?",qp:"musun il hasejo",qt:"Czym się zajmujesz?",a:"항구에서 일해요. 트레이딩이 취미예요. 43개국을 여행했고 5개 언어를 배우고 있어요. 당신은요?",ap:"hanggu eso ilhejojo. teureiding i czuimi jejo. samsip sam gegugeul jojong hessgo dasot gej onju reul pejugo issojo. tangsineunjo",at:"Pracuję w porcie. Trading to moje hobby. 43 kraje, 5 języków. A ty?"},
+      {q:"일해요, 아니면 학생이에요?",qp:"ilhejojo, animjon haksengijejo",qt:"Pracujesz czy studiujesz?",a:"일해요. 당신은요?",ap:"ilhejojo. tangsineunjo",at:"Pracuję. A ty?"},
+      {q:"정확히 어디 살아요?",qp:"czongwakhi odi sarajo",qt:"Gdzie mieszkasz?",a:"그단스크 근처 그디니아에 살아요.",ap:"Gdansk gunchzo Gdinia ej sarajo",at:"W Gdyni, blisko Gdańska."},
+      {q:"형제자매가 있어요?",qp:"hjongczejamega issojo",qt:"Masz rodzeństwo?",a:"네, 여동생이 있어요. 당신은요?",ap:"nej, jodongseng i issojo. tangsineunjo",at:"Tak, mam siostrę. A ty?"},
+      {q:"다른 나라에서 살아본 적 있어요?",qp:"tarun naraezo sarabbon czok issojo",qt:"Mieszkałeś za granicą?",a:"아니요, 하지만 여행을 많이 했어요. 당신은요?",ap:"anijo, haziman jojong ul manhi hessoejo. tangsineunjo",at:"Nie, ale dużo podróżowałem. A ty?"}
+    ]},
+    hobby:{title:"Hobby",phrases:[
+      {q:"여가 시간에 뭐 해요?",qp:"joga sigan ej mwo hejojo",qt:"Co robisz w wolnym czasie?",a:"비디오 게임을 하고, 드라마를 보고, 헬스장에 가요.",ap:"bidio gejim ul hago, deulama lul bogo, helseujang ej gajo",at:"Gram w gry, oglądam seriale i chodzę na siłownię."},
+      {q:"스포츠를 해요?",qp:"seupoczeu lul hejojo",qt:"Uprawiasz sport?",a:"네, 정기적으로 헬스장에 가요. 당신은요?",ap:"nej, czonggi czok ulo helseujang ej gajo. tangsineunjo",at:"Tak, regularnie. A ty?"},
+      {q:"어떤 음악을 들어요?",qp:"otton umag ul dulojo",qt:"Jakiej muzyki słuchasz?",a:"랩, 팝, 록을 좋아해요. 당신은요?",ap:"rep, pap, rok ul czohahejojo. tangsineunjo",at:"Rap, pop, rock. A ty?"},
+      {q:"여행을 좋아해요?",qp:"jojong ul czohahejojo",qt:"Lubisz podróżować?",a:"네, 정말요! 43개국을 여행했어요.",ap:"nej, czongmaljo! samsip sam gegugeul jojong hessoejo",at:"Tak, bardzo! 43 kraje."},
+      {q:"어떤 드라마를 봐요?",qp:"otton deulama lul bwajo",qt:"Jakie seriale?",a:"넷플릭스와 HBO 드라마를 봐요. 당신은요?",ap:"neppeulikseu wa HBO deulama lul bwajo. tangsineunjo",at:"Netflix i HBO. A ty?"},
+      {q:"비디오 게임을 해요?",qp:"bidio gejim ul hejojo",qt:"Grasz w gry?",a:"네, 많이요! 주로 PC로 해요.",ap:"nej, manhi jo! czulo PC lo hejojo",at:"Tak, dużo! Głównie PC."}
+    ]},
+    why:{title:"Dlaczego uczę się",phrases:[
+      {q:"왜 한국어를 배워요?",qp:"wej hangugeo lul bewojo",qt:"Dlaczego uczysz się koreańskiego?",a:"한국 문화를 좋아하고 한국에 여행하고 싶어요.",ap:"hangug munhwa lul czohahago hangug ej jojong hago sipojo",at:"Lubię kulturę koreańską i chcę tam pojechać."},
+      {q:"한국어를 얼마나 배웠어요?",qp:"hangugeo lul olmana bejossoejo",qt:"Jak długo uczysz się?",a:"몇 주 됐어요. 막 시작했어요.",ap:"mjot czu dwessojo. mak sidzakhessoejo",at:"Kilka tygodni. Właśnie zacząłem."},
+      {q:"어떻게 언어를 배워요?",qp:"ottoke onju lul bejojo",qt:"Jak uczysz się języka?",a:"앱, 영상, 원어민과의 대화로 배워요.",ap:"ep, jongszang, wonomin gwajoj tejwha lo bejojo",at:"Aplikacje, filmy, native speakerzy."},
+      {q:"한국에 가고 싶어요?",qp:"hangug ej gago sipojo",qt:"Chcesz pojechać do Korei?",a:"네, 정말요! 서울이랑 부산에 가고 싶어요.",ap:"nej, czongmaljo! Soul ilang Busan ej gago sipojo",at:"Tak! Seul i Busan."},
+      {q:"다른 언어도 배워요?",qp:"tarun onjudo bejojo",qt:"Uczysz się innych języków?",a:"네, 총 5개 언어를 배우고 있어요.",ap:"nej, czong dasot gej onju lul bejugo issojo",at:"Tak, pięciu łącznie."},
+      {q:"한국어가 어려워요?",qp:"hangugeo ga orjowo jo",qt:"Czy koreański jest trudny?",a:"발음이 제일 어려워요!",ap:"parum i czejil orjowo jo",at:"Wymowa jest najtrudniejsza!"},
+      {q:"한국어가 어때요?",qp:"hangugeo ga ottejo",qt:"Jak idzie ci koreański?",a:"한국어를 조금밖에 못 해요. 매일 배우고 있어요.",ap:"hangugeo lul czogum bakke mot hejojo. mejil bejugo issojo",at:"Tylko trochę gadam. Uczę się codziennie."}
+    ]},
+    travel:{title:"Podróże",phrases:[
+      {q:"여행을 많이 했어요?",qp:"jojong ul manhi hessoejo",qt:"Dużo podróżowałeś?",a:"네, 43개국을 여행했어요. 당신은요?",ap:"nej, samsip sam gegugeul jojong hessoejo. tangsineunjo",at:"Tak, 43 kraje. A ty?"},
+      {q:"어떤 나라가 가장 좋았어요?",qp:"otton nara ga gadzang czohassojo",qt:"Który kraj najlepszy?",a:"스페인이 정말 좋았어요! 세 번 갔어요.",ap:"Seupein i czongmal czohassojo! sej bon gassojo",at:"Hiszpania! Byłem trzy razy."},
+      {q:"더 여행하고 싶어요?",qp:"to jojong hago sipojo",qt:"Chcesz więcej podróżować?",a:"네, 모든 나라를 방문하고 싶어요!",ap:"nej, modum nara lul bangmun hago sipojo",at:"Tak, wszystkie kraje!"},
+      {q:"어떤 나라에 가고 싶어요?",qp:"otton nara ej gago sipojo",qt:"Który kraj chcesz odwiedzić?",a:"일본이랑 한국에 가고 싶어요.",ap:"Ilbon ilang Hangug ej gago sipojo",at:"Japonię i Koreę."},
+      {q:"여행할 때 어디서 지내요?",qp:"jojonghwal ttej odiso czinejojo",qt:"Gdzie mieszkasz gdy podróżujesz?",a:"보통 호텔이나 Airbnb에서 지내요.",ap:"botong hotel ina Airbnb ejo czinejojo",at:"Zazwyczaj hotel lub Airbnb."},
+      {q:"혼자 여행해요?",qp:"hondzza jojonghejojo",qt:"Podróżujesz sam?",a:"자주 혼자, 하지만 친구들이랑도 가요.",ap:"czadzu hondzza, haziman chinzudullilang do gajo",at:"Często sam, ale też z przyjaciółmi."},
+      {q:"가장 좋아하는 곳이 어디예요?",qp:"gadzang czohahanum got i odiejo",qt:"Ulubione miejsce?",a:"바르셀로나가 정말 좋았어요.",ap:"Baleusellona ga czongmal czohassojo",at:"Barcelona."},
+      {q:"여행을 얼마나 해요?",qp:"jojong ul olmana hejojo",qt:"Jak długo podróżujesz?",a:"보통 매번 1-2주 여행해요.",ap:"botong mejbon il i czu jojong hejojo",at:"Tydzień-dwa za każdym razem."},
+      {q:"한국에 온 적 있어요?",qp:"hangug ej on czok issojo",qt:"Byłeś w Korei?",a:"아직 없어요, 하지만 계획 중이에요!",ap:"adzik opsojo, haziman kjejhwek czung iejo",at:"Jeszcze nie, ale planuję!"}
+    ]},
+    react:{title:"Reakcje",phrases:[
+      {q:"대박!",qp:"dejbak",qt:"Niesamowite!",a:"정말 대박이죠!",ap:"czongmal dejbak idzo",at:"Naprawdę niesamowite!"},
+      {q:"진짜요?",qp:"czindzza jo",qt:"Naprawdę?",a:"네, 진짜예요!",ap:"nej, czindzza jejo",at:"Tak, naprawdę!"},
+      {q:"좋은데요!",qp:"czohun dejo",qt:"Świetnie!",a:"마음에 들어서 다행이에요!",ap:"maum ej duloszo tahejng iejo",at:"Cieszę się!"},
+      {q:"동의해요!",qp:"dong ujejo",qt:"Zgadzam się!",a:"저도 그렇게 생각해요.",ap:"czodo kulotke sengkakhejojo",at:"Ja też tak myślę."},
+      {q:"아쉽네요!",qp:"aszip nejojo",qt:"Szkoda!",a:"네, 정말 아쉬웠어요.",ap:"nej, czongmal aszip wossojo",at:"Tak, szkoda."},
+      {q:"인상적이에요!",qp:"insang czog iejo",qt:"Imponujące!",a:"인상을 받으셨나요?",ap:"insang ul badusjonnajo",at:"Robi wrażenie?"},
+      {q:"믿을 수 없어요!",qp:"midul su opsojo",qt:"Nie wierzę!",a:"정말이에요, 사실이에요!",ap:"czongmal iejo, sasil iejo",at:"Naprawdę!"},
+      {q:"흥미롭네요!",qp:"humg mi lob nejojo",qt:"Interesujące!",a:"네, 정말 흥미로워요.",ap:"nej, czongmal humg mi lowojo",at:"Bardzo interesujące."},
+      {q:"이런 우연이!",qp:"iron ujon i",qt:"Co za zbieg!",a:"네, 믿을 수 없어요!",ap:"nej, midul su opsojo",at:"Niesamowite!"},
+      {q:"정말 마음에 들어요!",qp:"czongmal maum ej durojojo",qt:"Bardzo mi się podoba!",a:"다행이에요!",ap:"tahejng iejo",at:"Cieszę się!"},
+      {q:"진지하게 말하는 거예요?",qp:"czindzzi hage malhanun go jejo",qt:"Mówisz poważnie?",a:"네, 완전히 진지해요!",ap:"nej, wandzonhi czindzzi hejojo",at:"Całkowicie poważnie!"},
+      {q:"어떻게 가능해요?",qp:"ottoke ganunghejoejo",qt:"Jak to możliwe?",a:"저도 이해 못 하겠어요!",ap:"czodo ihej mot hagessoejo",at:"Sam nie rozumiem!"},
+      {q:"이건 말이 안 돼요!",qp:"igun mal i an dwejojo",qt:"To szalone!",a:"알아요, 믿을 수가 없어요!",ap:"arajo, midul suga opsojo",at:"Wiem, niesamowite!"},
+      {q:"당신이 옳아요!",qp:"tangsini oltajo",qt:"Masz rację!",a:"감사해요, 감사합니다.",ap:"kamsahejojo, kamsahamnida",at:"Dziękuję."},
+      {q:"좋은 아이디어예요!",qp:"czohun aidija jejo",qt:"Dobry pomysł!",a:"마음에 들어서 다행이에요!",ap:"maum ej duloszo tahejng iejo",at:"Cieszę się!"},
+      {q:"당신의 개성이 인상적이에요!",qp:"tangsini gesong i insang czog iejo",qt:"Twoja osobowość robi wrażenie!",a:"감사해요, 그 말이 기뻐요!",ap:"kamsahejojo, ku mal i kibbojo",at:"Dziękuję, to mnie cieszy!"}
+    ]},
+    past:{title:"Przeszłość",phrases:[
+      {q:"주말에 뭐 했어요?",qp:"czumal ej mwo hessoejo",qt:"Co robiłeś w weekend?",a:"비디오 게임을 하고 드라마를 봤어요.",ap:"bidio gejim ul hago deulama lul bwassojo",at:"Grałem w gry i oglądałem seriale."},
+      {q:"최근에 어디 여행했어요?",qp:"czejgun ej odi jojonghessoejo",qt:"Gdzie ostatnio byłeś?",a:"지난달에 스페인에 갔어요.",ap:"dzinan tal ej Seupein ej gassojo",at:"Hiszpania w zeszłym miesiącu."},
+      {q:"무엇을 공부했어요?",qp:"mwut ul kongbuhessoejo",qt:"Co studiowałeś?",a:"대학에 다니지 않았어요. 일찍부터 일했어요.",ap:"tejhak ej danidzzi anassojo. ildzzig butho ilhessoejo",at:"Nie studiowałem, pracuję od młodości."},
+      {q:"어디서 자랐어요?",qp:"odiso dzarassojo",qt:"Gdzie dorastałeś?",a:"바다 근처 그디니아라는 도시에서 자랐어요.",ap:"bada gunchzo Gdinia ranum dosi ejo dzarassojo",at:"W Gdyni, blisko morza."},
+      {q:"가장 좋은 여행은 어디였어요?",qp:"gadzang czohun jojong un odiossojo",qt:"Najlepsza podróż?",a:"스페인 — 세 번 갔어요!",ap:"Seupein — sej bon gassojo",at:"Hiszpania — byłem trzy razy!"},
+      {q:"예전에 다른 언어를 배운 적 있어요?",qp:"jedzzon ej tarun onju lul bejun czok issojo",qt:"Uczyłeś się wcześniej języka?",a:"네, 어릴 때부터 영어를 배웠어요.",ap:"nej, oril ttejbutho jongo lul bejossojo",at:"Tak, angielski od dziecka."},
+      {q:"어제 뭐 했어요?",qp:"odzze mwo hessoejo",qt:"Co robiłeś wczoraj?",a:"일하고 나서 헬스장에 갔어요.",ap:"ilhago naszo helseujang ej gassojo",at:"Praca, potem siłownia."},
+      {q:"언제 여기 왔어요?",qp:"ondzze jogi wassojo",qt:"Kiedy tu przyjechałeś?",a:"최근에 왔어요, 며칠 동안이요.",ap:"czejgun ej wassojo, mjochil dongan iojo",at:"Niedawno, na kilka dni."},
+      {q:"여행에서 뭐가 가장 좋았어요?",qp:"jojong eszo mwoga gadzang czohassojo",qt:"Co najlepsze?",a:"음식과 사람들이요.",ap:"umsik gwa saramdul iojo",at:"Kuchnia i ludzie."},
+      {q:"흥미로운 사람들을 만났어요?",qp:"humg mi loun saramdul ul mannassojo",qt:"Ciekawi ludzie?",a:"네, 많이요! 그게 여행의 가장 좋은 점이에요.",ap:"nej, manhi jo! kuge jojong ej gadzang czohun czom iejo",at:"Tak, wielu! To najlepsze w podróżowaniu."},
+      {q:"재미있는 에피소드가 있었어요?",qp:"dzejmi inun epizhodo ga issossojo",qt:"Śmieszne zdarzenie?",a:"네, 한번은 낯선 도시에서 길을 잃었어요!",ap:"nej, hanbun un nadszon dosi eszo giru ilossojo",at:"Tak, raz zgubiłem się!"}
+    ]},
+    future:{title:"Przyszłość",phrases:[
+      {q:"어떤 계획이 있어요?",qp:"otton kjejhwek i issojo",qt:"Jakie plany?",a:"계속 여행하고 언어를 배우고 싶어요.",ap:"kjejsok jojonghago onju lul bejugo sipojo",at:"Podróżować i uczyć się języków."},
+      {q:"해외에서 살고 싶어요?",qp:"hejwej eszo salgo sipojo",qt:"Mieszkać za granicą?",a:"잠깐은 그럴 수도 있어요.",ap:"dzamkkan un kulol sudo issojo",at:"Może przez jakiś czas."},
+      {q:"~할 계획이에요",qp:"hal kjejhwek iejo",qt:"Mam zamiar...",a:"올해 한국을 방문할 계획이에요.",ap:"olhej hangug ul bangmunhal kjejhwek iejo",at:"Mam zamiar odwiedzić Koreę w tym roku."},
+      {q:"어떤 계획이 있으세요?",qp:"otton kjejhwek i isusejo",qt:"Twoje plany?",a:"새로운 나라를 여행하고 새로운 언어를 배우는 거예요.",ap:"sejloun nara lul jojonghago sejloun onju lul bejunun go jejo",at:"Nowe kraje, nowe języki."},
+      {q:"내일 뭐 할 거예요?",qp:"nejil mwo hal go jejo",qt:"Co jutro?",a:"일하러 가고 그다음에 헬스장에 갈 거예요.",ap:"ilhalo gago kudam um ej helseujang ej gal go jejo",at:"Praca, potem siłownia."},
+      {q:"어디로 휴가를 갈 거예요?",qp:"odilo hjuga lul gal go jejo",qt:"Wakacje?",a:"올해 아시아에 가는 걸 생각하고 있어요.",ap:"olhej Ashia ej ganun gol sengkakhago issojo",at:"Azja w tym roku."},
+      {q:"다음에 어떤 언어를 배울 거예요?",qp:"taum ej otton onju lul bejul go jejo",qt:"Następny język?",a:"일본어나 그리스어를 생각하고 있어요.",ap:"Ilbono na Guliso lul sengkakhago issojo",at:"Japoński lub grecki."}
+    ]},
+    numbers:{title:"Liczby i czas",phrases:[
+      {q:"지금 몇 시예요?",qp:"dzigum mjot si jejo",qt:"Która godzina?",a:"세 시 반이에요. / 정확히 한 시예요.",ap:"sej si ban iejo / czongwakhi han si jejo",at:"Wpół do czwartej / dokładnie pierwsza."},
+      {q:"오늘 무슨 요일이에요?",qp:"onul musun joil iejo",qt:"Jaki dzień?",a:"오늘은 월요일/화요일/수요일...",ap:"onurun woljojil / hwajojil / sujojil",at:"Poniedziałek / wtorek / środa..."},
+      {q:"요일",qp:"joil",qt:"Dni tygodnia",a:"월요일, 화요일, 수요일, 목요일, 금요일, 토요일, 일요일",ap:"woljojil, hwajojil, sujojil, mogjojil, kumjojil, tojojil, iljojil",at:"Pn, Wt, Śr, Cz, Pt, Sb, Nd"},
+      {q:"얼마예요?",qp:"olma jejo",qt:"Ile kosztuje?",a:"이게 얼마예요? — 천 원이에요.",ap:"ige olma jejo — chon won iejo",at:"Ile to? — Tysiąc wonów."},
+      {q:"달",qp:"tal",qt:"Miesiące",a:"1월, 2월, 3월, 4월, 5월, 6월, 7월, 8월, 9월, 10월, 11월, 12월",ap:"il wol, i wol, sam wol, sa wol, o wol, juk wol...",at:"Styczeń, luty, marzec..."},
+      {q:"숫자: 1-20",qp:"sudzza: 1-20",qt:"Liczby: 1-20",a:"일, 이, 삼, 사, 오, 육, 칠, 팔, 구, 십, 십일, 십이, 십삼, 십사, 십오, 십육, 십칠, 십팔, 십구, 이십",ap:"il, i, sam, sa, o, juk, chil, pal, gu, sip, sipil, sipi, sipsam, sipsa, sipo, sipjuk, sipchil, sippal, sipgu, isip",at:"1-20 po koreańsku"},
+      {q:"숫자: 30-100",qp:"sudzza: 30-100",qt:"Liczby: 30-100",a:"삼십(30), 사십(40), 오십(50), 육십(60), 칠십(70), 팔십(80), 구십(90), 백(100)",ap:"samsip, sasip, osip, juksip, chilsip, palsip, gusip, pek",at:"30-100 po koreańsku"},
+      {q:"여기 얼마나 있었어요?",qp:"jogi olmana issossojo",qt:"Jak długo tu jesteś?",a:"일주일 있었어요. 당신은요?",ap:"ildzu il issossojo. tangsineunjo",at:"Tydzień. A ty?"}
+    ]},
+    slang:{title:"Slang",phrases:[
+      {q:"대박!",qp:"dejbak",qt:"Niesamowite!",a:"진짜 대박이다!",ap:"czindzzza dejbak ida",at:"Naprawdę niesamowite!"},
+      {q:"헐!",qp:"hol",qt:"O nie! / Wow!",a:"헐, 진짜?!",ap:"hol, czindzzza",at:"Wow, serio?!"},
+      {q:"ㅋㅋㅋ (크크크)",qp:"kukukuku",qt:"Hahaha",a:"너무 웃겨!",ap:"nomu uzgjo",at:"Za śmieszne!"},
+      {q:"넘 좋아!",qp:"nom czohia",qt:"Bardzo fajnie!",a:"나도 넘 좋아!",ap:"nado nom czohia",at:"Ja też!"},
+      {q:"완전!",qp:"wandzon",qt:"Totalnie!",a:"완전 동의해!",ap:"wandzon dong ujhej",at:"Całkowicie się zgadzam!"},
+      {q:"뭐야!",qp:"mwoja",qt:"Co jest?!",a:"왜 그래?",ap:"wej gulej",at:"Co się dzieje?"},
+      {q:"실화냐?",qp:"silhwanja",qt:"To prawda?",a:"진짜라니까!",ap:"czindzzza lanikka",at:"Naprawdę!"},
+      {q:"바이바이!",qp:"bajbaj",qt:"Pa pa!",a:"바이! 또 봐!",ap:"baj! tto bwa",at:"Pa! Do zobaczenia!"},
+      {q:"갓!",qp:"got",qt:"Mistrz!",a:"진짜 갓이다!",ap:"czindzzza got ida",at:"Naprawdę mistrz!"},
+      {q:"존잘!",qp:"dzondzal",qt:"Bardzo ładny! (slang)",a:"고마워!",ap:"komawoj",at:"Dziękuję!"}
+    ]},
+    mistakes:{title:"Nieporozumienia",phrases:[
+      {q:"이해가 안 돼요.",qp:"ihej ga an dwejojo",qt:"Nie rozumiem.",a:"설명해 줄 수 있어요?",ap:"solmjong hej dzul su issojo",at:"Możesz wyjaśnić?"},
+      {q:"더 천천히 말해줄 수 있어요?",qp:"to chonchzonhi malhejdzul su issojo",qt:"Wolniej?",a:"네, 죄송해요! 이렇게요?",ap:"nej, dzwejsong hejojo! ilotke jo",at:"Tak, przepraszam!"},
+      {q:"한국어로 어떻게 말해요?",qp:"hangugeo lo ottoke malhejojo",qt:"Jak to po koreańsku?",a:"잠깐만요, 말해드릴게요...",ap:"dzamkkan man jo, malhejdulilge jo",at:"Chwila, powiem ci..."},
+      {q:"실수했어요.",qp:"silsu hessoejo",qt:"Popełniłem błąd.",a:"괜찮아요! 그렇게 배우는 거예요.",ap:"gwenchzanajo! kulotke bejunun go jejo",at:"Nic się nie stało!"},
+      {q:"써줄 수 있어요?",qp:"ssojdzul su issojo",qt:"Możesz napisać?",a:"물론이죠, 잠깐만요.",ap:"mullon idzo, dzamkkan man jo",at:"Oczywiście."},
+      {q:"어떻게 말해야 할지 모르겠어요.",qp:"ottoke malheja haldzzi molugessojo",qt:"Nie wiem jak powiedzieć.",a:"걱정 마세요, 해보세요!",ap:"gokdzzong masejo, hejbosejo",at:"Nie martw się, spróbuj!"},
+      {q:"무슨 뜻이에요?",qp:"musun ttuds iejo",qt:"Co masz na myśli?",a:"좀 더 설명해 줄 수 있어요?",ap:"dzom to solmjong hej dzul su issojo",at:"Wyjaśnij więcej."},
+      {q:"죄송해요, 못 들었어요.",qp:"dzwejsong hejojo, mot durossojo",qt:"Nie słyszałem.",a:"괜찮아요, 다시 말할게요.",ap:"gwenchzanajo, tasi malhalge jo",at:"Nic się nie stało, powtórzę."}
+    ]},
+    work:{title:"Praca — Steward",phrases:[
+      {q:"탑승해 주셔서 감사합니다!",qp:"tapsunghej dzu sjoso kamsahamnida",qt:"Dziękujemy za wejście na pokład!",a:"오늘 함께 해주셔서 감사합니다.",ap:"onul hamkke hejdzusjoso kamsahamnida",at:"Dziękujemy za podróż z nami."},
+      {q:"안전벨트를 착용해 주세요.",qp:"andzzonbelteu lul chakjong hej dzu sejjo",qt:"Prosimy zapiąć pasy.",a:"협조해 주셔서 감사합니다.",ap:"hjopdzjo hej dzusjoso kamsahamnida",at:"Dziękujemy za współpracę."},
+      {q:"음료는 무엇으로 드릴까요?",qp:"umljo nun mwot ulo durilkkajo",qt:"Coś do picia?",a:"물, 주스, 음료수, 커피가 있습니다.",ap:"mul, dzusu, umljosu, kophi ga itseumnida",at:"Woda, sok, napoje, kawa."},
+      {q:"식사는 무엇으로 드릴까요?",qp:"siksza nun mwot ulo durilkkajo",qt:"Coś do jedzenia?",a:"메뉴를 가져다 드릴게요.",ap:"menjul lul gadzjoda durilge jo",at:"Przyniosę menu."},
+      {q:"수하물 도움이 필요하세요?",qp:"suhamul doum i pilyohaszejo",qt:"Pomoc z bagażem?",a:"제가 도와드리겠습니다.",ap:"czje ga dowaduliges seumnida",at:"Pomogę."},
+      {q:"전자기기를 꺼주세요.",qp:"dzondza gigi lul kko dzusejo",qt:"Prosimy wyłączyć urządzenia.",a:"이해해 주셔서 감사합니다.",ap:"ihejhej dzusjoso kamsahamnida",at:"Dziękujemy za zrozumienie."},
+      {q:"괜찮으세요? 도움이 필요하세요?",qp:"gwenchzanusejo? doum i pilyohaszejo",qt:"Wszystko dobrze?",a:"무엇이든 도움이 필요하시면 말씀해 주세요.",ap:"mwot idun doum i pilyohaszimjon malssumhej dzu sejjo",at:"Jestem do dyspozycji."},
+      {q:"도착을 축하합니다!",qp:"tochak ul chukha hamnida",qt:"Gratulujemy przybycia!",a:"즐거운 여행이셨기를 바랍니다.",ap:"dzulgo un jojong isjotgi lul barabnida",at:"Mam nadzieję na przyjemną podróż."},
+      {q:"저희 항공을 이용해 주셔서 감사합니다.",qp:"dzohej hangong ul ijnghej dzusjoso kamsahamnida",qt:"Dziękujemy za wybranie naszego lotu.",a:"다시 뵙기를 기대합니다!",ap:"tasi bojpgi lul gidejhamnida",at:"Do zobaczenia!"}
+    ]},
+    bye:{title:"Pożegnanie",phrases:[
+      {q:"안녕히 가세요!",qp:"annjonghi gasejo",qt:"Do widzenia!",a:"안녕히 가세요! 좋은 여행 되세요!",ap:"annjonghi gasejo! czohun jojong twejsejo",at:"Do widzenia! Dobrej podróży!"},
+      {q:"또 봐요!",qp:"tto bwajo",qt:"Do zobaczenia!",a:"네, 곧 또 봐요!",ap:"nej, got tto bwajo",at:"Do zobaczenia wkrótce!"},
+      {q:"만나서 반가웠어요!",qp:"mannaszo bangawossojo",qt:"Miło cię było poznać!",a:"저도요! 또 봐요!",ap:"czodo jo! tto bwajo",at:"Wzajemnie!"},
+      {q:"잘 자요!",qp:"dzal dzajo",qt:"Dobranoc!",a:"당신도요! 좋은 꿈 꾸세요!",ap:"tangsindo jo! czohun kkum kkusejo",at:"Dobranoc!"},
+      {q:"이야기 나눠서 좋았어요!",qp:"ijagi nanwoszo czohassojo",qt:"Świetnie było rozmawiać!",a:"저도요! 다음에 또 봐요!",ap:"czodo jo! taum ej tto bwajo",at:"Wzajemnie! Do następnego razu!"}
+    ]}
+  }},
+  pt:{color:"#16a34a",flag:"🇵🇹",name:"Portugalski",categories:{
+    greet:{title:"Powitanie",phrases:[
+      {q:"Olá! Como você está?",qp:"ola! komu wose esta",qt:"Cześć! Jak się masz?",a:"Estou bem, obrigado! E você?",ap:"estou bejng, obrigadu! e wose",at:"Dobrze, dziękuję! A ty?"},
+      {q:"Qual é o seu nome?",qp:"kwal e u seu nom",qt:"Jak masz na imię?",a:"Me chamo Kacper. E você?",ap:"mi szamu Kasper. e wose",at:"Mam na imię Kacper. A ty?"},
+      {q:"De onde você é?",qp:"dzi ondzi wose e",qt:"Skąd jesteś?",a:"Sou da Polônia, de Gdynia. E você?",ap:"sou da Polonia, dzi Gdinia. e wose",at:"Z Polski, z Gdyni. A ty?"},
+      {q:"Quantos anos você tem?",qp:"kwantus anus wose tejng",qt:"Ile masz lat?",a:"Tenho vinte e sete anos. E você?",ap:"tenhu wintzi i seti anus. e wose",at:"27 lat. A ty?",v:["Tenho vinte e cinco anos. – 25 lat.","Tenho trinta anos. – 30 lat.","Me dizem que não aparento minha idade! – Nie wyglądam na swój wiek!"]},
+      {q:"Você é daqui?",qp:"wose e dakwi",qt:"Jesteś stąd?",a:"Não, sou da Polônia. E você, de onde é?",ap:"nau, sou da Polonia. e wose, dzi ondzi e",at:"Nie, jestem z Polski. A ty?"}
+    ]},
+    info:{title:"Kim jestem",phrases:[
+      {q:"Qual é a sua profissão?",qp:"kwal e a sua profisaung",qt:"Czym się zajmujesz?",a:"Trabalho no porto de Gdynia. O trading é meu hobby. Visitei 43 países e aprendo 5 idiomas. E você?",ap:"trabalhu nu portu dzi Gdinia. u treding e meu jobi. wizijtej 43 pajzes e aprendu 5 idiomas. e wose",at:"Pracuję w porcie. Trading to moje hobby. 43 kraje, 5 języków. A ty?"},
+      {q:"Você trabalha ou estuda?",qp:"wose trabala ou estuda",qt:"Pracujesz czy studiujesz?",a:"Eu trabalho. E você?",ap:"eu trabalhu. e wose",at:"Pracuję. A ty?"},
+      {q:"Onde você mora exatamente?",qp:"ondzi wose mora egzatamenti",qt:"Gdzie mieszkasz?",a:"Moro em Gdynia, perto de Gdańsk. E você?",ap:"moru ej Gdinia, pertu dzi Gdansk. e wose",at:"W Gdyni, blisko Gdańska."},
+      {q:"Você tem irmãos?",qp:"wose tejng ilmaungs",qt:"Masz rodzeństwo?",a:"Sim, tenho uma irmã. E você?",ap:"sing, tenhu uma ilman. e wose",at:"Tak, mam siostrę. A ty?"},
+      {q:"Você já morou em outro país?",qp:"wose dza moru ej outru pais",qt:"Mieszkałeś za granicą?",a:"Não, mas viajei muito. E você?",ap:"nau, mas wiadziej mujtu. e wose",at:"Nie, ale dużo podróżowałem. A ty?"}
+    ]},
+    hobby:{title:"Hobby",phrases:[
+      {q:"O que você faz no tempo livre?",qp:"u ki wose faz nu tejngpu liwri",qt:"Co robisz w wolnym czasie?",a:"Jogo videogame, assisto séries e vou à academia.",ap:"dzogu widiogejm, asistu seris e wou a akademia",at:"Gram w gry, oglądam seriale i chodzę na siłownię."},
+      {q:"Você pratica esportes?",qp:"wose pratika esportis",qt:"Uprawiasz sport?",a:"Sim, vou à academia regularmente. E você?",ap:"sing, wou a akademia regullarmenti. e wose",at:"Tak, regularnie. A ty?"},
+      {q:"Que tipo de música você ouve?",qp:"ki tipu dzi muzika wose owwi",qt:"Jakiej muzyki słuchasz?",a:"Gosto de rap, pop e rock. E você?",ap:"gostu dzi rap, pop e rock. e wose",at:"Rap, pop, rock. A ty?"},
+      {q:"Você gosta de viajar?",qp:"wose gosta dzi wiadjar",qt:"Lubisz podróżować?",a:"Sim, muito! Já fui a 43 países.",ap:"sing, mujtu! dza fui a 43 pajzes",at:"Tak, bardzo! 43 kraje."},
+      {q:"Quais séries você assiste?",qp:"kwais seris wose asisti",qt:"Jakie seriale?",a:"Assisto séries na Netflix e HBO. E você?",ap:"asistu seris na Netzfliks e HBO. e wose",at:"Netflix i HBO. A ty?"},
+      {q:"Você joga videogame?",qp:"wose dzoga widiogejm",qt:"Grasz w gry?",a:"Sim, muito! Principalmente no PC.",ap:"sing, mujtu! principalmenti nu PC",at:"Tak, dużo! Głównie PC."}
+    ]},
+    why:{title:"Dlaczego uczę się",phrases:[
+      {q:"Por que você aprende português?",qp:"pur ki wose aprendi portugejs",qt:"Dlaczego uczysz się portugalskiego?",a:"Porque gosto do idioma e quero viajar para Portugal e Brasil.",ap:"porki gostu du idioma e keru wiadjar para Portugal i Brazil",at:"Lubię ten język i chcę pojechać do Portugalii i Brazylii."},
+      {q:"Há quanto tempo você aprende português?",qp:"a kwantu tejngpu wose aprendi portugejs",qt:"Jak długo uczysz się?",a:"Algumas semanas. Acabei de começar.",ap:"algunas semanas. akabej dzi komesar",at:"Kilka tygodni. Właśnie zacząłem."},
+      {q:"Como você aprende o idioma?",qp:"komu wose aprendi u idioma",qt:"Jak uczysz się języka?",a:"Com aplicativos, vídeos e conversando com nativos.",ap:"kong aplikatiwus, wideus e konwersandu kong natiws",at:"Aplikacje, filmy, native speakerzy."},
+      {q:"Você quer visitar Portugal?",qp:"wose ker wiszitar Portugal",qt:"Chcesz odwiedzić Portugalię?",a:"Sim, muito! E também o Brasil.",ap:"sing, mujtu! e tambejng u Brazil",at:"Tak, bardzo! I Brazylię."},
+      {q:"Você aprende outros idiomas também?",qp:"wose aprendi outrus idiomas tambejng",qt:"Uczysz się innych języków?",a:"Sim, aprendo cinco idiomas no total.",ap:"sing, aprendu sinku idiomas nu total",at:"Tak, pięciu łącznie."},
+      {q:"O português é difícil?",qp:"u portugejs e dzifisil",qt:"Czy portugalski jest trudny?",a:"As diferenças com o espanhol são a maior dificuldade!",ap:"as diferensas kong u espanjol saung a maior difikuldadzi",at:"Różnice od hiszpańskiego!"},
+      {q:"Como está indo seu português?",qp:"komu esta indu seu portugejs",qt:"Jak idzie ci?",a:"Falo só um pouco de português. Aprendo todo dia.",ap:"falu so ung pouku dzi portugejs. aprendu todu dzia",at:"Tylko trochę gadam. Uczę się codziennie."}
+    ]},
+    travel:{title:"Podróże",phrases:[
+      {q:"Você viajou muito?",qp:"wose wiadziou mujtu",qt:"Dużo podróżowałeś?",a:"Sim, fui a 43 países. E você?",ap:"sing, fui a 43 pajzes. e wose",at:"Tak, 43 kraje. A ty?"},
+      {q:"Qual país você mais gostou?",qp:"kwal pais wose mais gosou",qt:"Który kraj najlepszy?",a:"A Espanha foi incrível! Fui três vezes.",ap:"a Espanja foi inkrivel! fui trez wezes",at:"Hiszpania! Byłem trzy razy."},
+      {q:"Você quer viajar mais?",qp:"wose ker wiadjar mais",qt:"Chcesz więcej podróżować?",a:"Sim, quero visitar todos os países!",ap:"sing, keru wiszitar todus us pajzes",at:"Tak, wszystkie kraje!"},
+      {q:"Qual país você quer visitar?",qp:"kwal pais wose ker wiszitar",qt:"Który kraj chcesz odwiedzić?",a:"Quero ir ao Japão e à Coreia.",ap:"keru ir ao Dżapang e a Koreja",at:"Japonię i Koreę."},
+      {q:"Onde você fica quando viaja?",qp:"ondzi wose fika kwandu wiadza",qt:"Gdzie mieszkasz gdy podróżujesz?",a:"Geralmente em hotéis ou Airbnb.",ap:"dzeralmentzi ej hotejs ou Airbnb",at:"Zazwyczaj hotel lub Airbnb."},
+      {q:"Você viaja sozinho?",qp:"wose wiadza sozinhu",qt:"Podróżujesz sam?",a:"Frequentemente sozinho, mas também com amigos.",ap:"frekwentimemti sozinhu, mas tambejng kong amigus",at:"Często sam, też z przyjaciółmi."},
+      {q:"Qual é o seu lugar favorito?",qp:"kwal e u seu lugar favoritu",qt:"Ulubione miejsce?",a:"Barcelona foi incrível.",ap:"Barselona foi inkrivel",at:"Barcelona była niesamowita."},
+      {q:"Por quanto tempo você viaja?",qp:"pur kwantu tejngpu wose wiadza",qt:"Jak długo?",a:"Geralmente de uma a duas semanas por vez.",ap:"dzeralmentzi dzi uma a duas semanas pur wez",at:"Tydzień-dwa za każdym razem."},
+      {q:"Você já foi a Portugal?",qp:"wose dza foi a Portugal",qt:"Byłeś w Portugalii?",a:"Ainda não, mas estou planejando!",ap:"ajnda nau, mas estou planedziandu",at:"Jeszcze nie, ale planuję!"}
+    ]},
+    react:{title:"Reakcje",phrases:[
+      {q:"Incrível!",qp:"inkrivel",qt:"Niesamowite!",a:"Sim, realmente!",ap:"sing, realmentzi",at:"Tak, rzeczywiście!"},
+      {q:"Sério?",qp:"serju",qt:"Naprawdę?",a:"Sim, sério!",ap:"sing, serju",at:"Tak, serio!"},
+      {q:"Que legal!",qp:"ki legal",qt:"Świetnie!",a:"Fico feliz que você gostou!",ap:"fiku feliz ki wose gosou",at:"Cieszę się!"},
+      {q:"Concordo!",qp:"kongkordu",qt:"Zgadzam się!",a:"Penso a mesma coisa.",ap:"pensu a mezma koiza",at:"Ja też tak myślę."},
+      {q:"Que pena!",qp:"ki pena",qt:"Szkoda!",a:"Sim, foi uma pena.",ap:"sing, foi uma pena",at:"Tak, szkoda."},
+      {q:"Impressionante!",qp:"impresionantzi",qt:"Imponujące!",a:"Você ficou impressionado?",ap:"wose fikou impresionadu",at:"Robi wrażenie?"},
+      {q:"Não acredito!",qp:"nau akreditu",qt:"Nie wierzę!",a:"É verdade, sério!",ap:"e werdadzi, serju",at:"Naprawdę!"},
+      {q:"Que interessante!",qp:"ki interesantzi",qt:"Interesujące!",a:"Sim, é muito interessante.",ap:"sing, e mujtu interesantzi",at:"Bardzo interesujące."},
+      {q:"Que coincidência!",qp:"ki koinsidensja",qt:"Co za zbieg!",a:"Sim, inacreditável!",ap:"sing, inakreditavel",at:"Niesamowite!"},
+      {q:"Adorei!",qp:"adorej",qt:"Uwielbiam!",a:"Fico feliz!",ap:"fiku feliz",at:"Cieszę się!"},
+      {q:"Está falando sério?",qp:"esta falandu serju",qt:"Mówisz poważnie?",a:"Sim, completamente sério!",ap:"sing, kompletamntzi serju",at:"Całkowicie poważnie!"},
+      {q:"Como é possível?",qp:"komu e posivel",qt:"Jak to możliwe?",a:"Eu também não entendo!",ap:"eu tambejng nau entejndu",at:"Sam nie rozumiem!"},
+      {q:"Isso é louco!",qp:"isu e louku",qt:"To szalone!",a:"Sei, inacreditável!",ap:"sej, inakreditavel",at:"Wiem, niesamowite!"},
+      {q:"Você tem razão!",qp:"wose tejng razaung",qt:"Masz rację!",a:"Obrigado, fico feliz.",ap:"obrigadu, fiku feliz",at:"Dziękuję."},
+      {q:"Boa ideia!",qp:"boa ideja",qt:"Dobry pomysł!",a:"Fico feliz que gostou!",ap:"fiku feliz ki gosou",at:"Cieszę się!"},
+      {q:"Sua personalidade me impressiona!",qp:"sua personalidadzi mi impresiona",qt:"Twoja osobowość robi wrażenie!",a:"Muito obrigado, isso me deixa feliz!",ap:"mujtu obrigadu, isu mi dejksa feliz",at:"Dziękuję, to mnie cieszy!"}
+    ]},
+    past:{title:"Przeszłość",phrases:[
+      {q:"O que você fez no fim de semana?",qp:"u ki wose fez nu fing dzi semana",qt:"Co robiłeś w weekend?",a:"Joguei videogame e assisti séries.",ap:"dzoguej widiogejm e asisti seris",at:"Grałem w gry i oglądałem seriale."},
+      {q:"Para onde você viajou recentemente?",qp:"para ondzi wose wiadziou resentimentzi",qt:"Gdzie ostatnio byłeś?",a:"Fui para a Espanha no mês passado.",ap:"fui para a Espanja nu mes pasadu",at:"Hiszpania w zeszłym miesiącu."},
+      {q:"O que você estudou?",qp:"u ki wose estudou",qt:"Co studiowałeś?",a:"Não estudei, comecei a trabalhar cedo.",ap:"nau estudej, komesej a trabaljar sedu",at:"Nie studiowałem, pracuję od młodości."},
+      {q:"Onde você cresceu?",qp:"ondzi wose kreseu",qt:"Gdzie dorastałeś?",a:"Em Gdynia, uma cidade perto do mar.",ap:"ej Gdinia, uma sidadzi pertu du mar",at:"W Gdyni, blisko morza."},
+      {q:"Qual foi sua melhor viagem?",qp:"kwal foi sua melor wiadżem",qt:"Najlepsza podróż?",a:"A Espanha — já fui três vezes!",ap:"a Espanja — dza fui trez wezes",at:"Hiszpania — trzy razy!"},
+      {q:"Você já aprendeu outro idioma antes?",qp:"wose dza aprendeu outru idioma antis",qt:"Uczyłeś się wcześniej?",a:"Sim, inglês desde criança.",ap:"sing, ingles dezdi kriansa",at:"Tak, angielski od dziecka."},
+      {q:"O que você fez ontem?",qp:"u ki wose fez ontejng",qt:"Co robiłeś wczoraj?",a:"Trabalhei e depois fui à academia.",ap:"trabajej e dipois fui a akademia",at:"Praca, potem siłownia."},
+      {q:"Quando você chegou aqui?",qp:"kwandu wose szegou akwi",qt:"Kiedy tu przyjechałeś?",a:"Cheguei recentemente, por alguns dias.",ap:"szeguej resentemntzi, pur algunos dzias",at:"Niedawno, na kilka dni."},
+      {q:"O que você mais gostou na viagem?",qp:"u ki wose mais gosou na wiadżem",qt:"Co najlepsze?",a:"A comida e as pessoas.",ap:"a komida e as pesoas",at:"Kuchnia i ludzie."},
+      {q:"Você conheceu pessoas interessantes?",qp:"wose konjeseu pesoas interesantis",qt:"Ciekawi ludzie?",a:"Sim, muitas! Isso é o melhor das viagens.",ap:"sing, mujtas! isu e u mejor das wiadżens",at:"Tak, wielu! To najlepsze w podróżowaniu."},
+      {q:"Teve algum episódio engraçado?",qp:"tewe algun epizoddiu engrasadu",qt:"Śmieszne zdarzenie?",a:"Sim, uma vez me perdi numa cidade estranha!",ap:"sing, uma wez mi perdzi numa sidadzi estranya",at:"Tak, raz zgubiłem się!"}
+    ]},
+    future:{title:"Przyszłość",phrases:[
+      {q:"Quais são seus planos?",qp:"kwais saung seus planus",qt:"Jakie plany?",a:"Quero continuar viajando e aprendendo idiomas.",ap:"keru kontinuar wiadżandu e aprendejndu idiomas",at:"Podróżować i uczyć się języków."},
+      {q:"Você quer morar no exterior?",qp:"wose ker morar nu eksterior",qt:"Mieszkać za granicą?",a:"Talvez por um tempo, sim.",ap:"talwez pur ung tejngpu, sing",at:"Może przez jakiś czas."},
+      {q:"Pretendo...",qp:"pretendu",qt:"Mam zamiar...",a:"Pretendo visitar Portugal este ano.",ap:"pretendu wiszitar Portugal esti anu",at:"Mam zamiar odwiedzić Portugalię w tym roku."},
+      {q:"Quais são os seus planos?",qp:"kwais saung us seus planus",qt:"Twoje plany?",a:"Viajar para novos países e aprender novos idiomas.",ap:"wiadżar para nowus pajzes e aprender nowus idiomas",at:"Nowe kraje, nowe języki."},
+      {q:"O que você vai fazer amanhã?",qp:"u ki wose waj fazer amanja",qt:"Co jutro?",a:"Vou trabalhar e depois ir à academia.",ap:"wou trabajar e dipois ir a akademia",at:"Praca, potem siłownia."},
+      {q:"Para onde você vai nas férias?",qp:"para ondzi wose waj nas ferias",qt:"Wakacje?",a:"Estou pensando em ir para a Ásia este ano.",ap:"estou pensandu ej ir para a Azja esti anu",at:"Azja w tym roku."},
+      {q:"Qual idioma você vai aprender depois?",qp:"kwal idioma wose waj aprender dipois",qt:"Następny język?",a:"Estou pensando em japonês ou coreano.",ap:"estou pensandu ej japonejs ou koreanu",at:"Japoński lub koreański."}
+    ]},
+    numbers:{title:"Liczby i czas",phrases:[
+      {q:"Que horas são?",qp:"ki oras saung",qt:"Która godzina?",a:"São três e meia. / É uma hora em ponto.",ap:"saung trez i meja / e uma ora ej pongtu",at:"Wpół do czwartej / dokładnie pierwsza."},
+      {q:"Que dia é hoje?",qp:"ki dzia e odze",qt:"Jaki dzień?",a:"Hoje é segunda/terça/quarta...",ap:"odze e segunda / tersa / kwarta",at:"Poniedziałek / wtorek / środa..."},
+      {q:"Os dias da semana",qp:"us dzias da semana",qt:"Dni tygodnia",a:"Segunda, terça, quarta, quinta, sexta, sábado, domingo",ap:"segunda, tersa, kwarta, kinta, szesta, sabadu, domingo",at:"Pn, Wt, Śr, Cz, Pt, Sb, Nd"},
+      {q:"Quanto custa?",qp:"kwantu kusta",qt:"Ile kosztuje?",a:"Quanto custa isso? — Custa dez euros.",ap:"kwantu kusta isu — kusta dez euros",at:"Ile to? — Dziesięć euro."},
+      {q:"Os meses do ano",qp:"us mezes du anu",qt:"Miesiące",a:"Janeiro, fevereiro, março, abril, maio, junho, julho, agosto, setembro, outubro, novembro, dezembro",ap:"dzaneru, fewereru, marsu, abril, maju, dzunu...",at:"Styczeń, luty, marzec..."},
+      {q:"Números: 1-20",qp:"numerus: 1-20",qt:"Liczby: 1-20",a:"Um, dois, três, quatro, cinco, seis, sete, oito, nove, dez, onze, doze, treze, catorze, quinze, dezesseis, dezessete, dezoito, dezenove, vinte",ap:"ung, dois, trez, kwatru, sinku, sejs, seti, ojtu, novi, dez, onzi, dozi, trezi, kaitorzi, kinzi, dezisejs, deziseti, dezojtu, dezinowi, wintzi",at:"1-20 po portugalsku"},
+      {q:"Números: 30-100",qp:"numerus: 30-100",qt:"Liczby: 30-100",a:"Trinta (30), quarenta (40), cinquenta (50), sessenta (60), setenta (70), oitenta (80), noventa (90), cem (100)",ap:"trinta, kwarenta, sinkwenta, sesenta, setenta, ojtenta, nowenta, sejng",at:"30-100 po portugalsku"},
+      {q:"Há quanto tempo você está aqui?",qp:"a kwantu tejngpu wose esta akwi",qt:"Jak długo tu jesteś?",a:"Estou aqui há uma semana. E você?",ap:"estou akwi a uma semana. e wose",at:"Tydzień. A ty?"}
+    ]},
+    slang:{title:"Slang",phrases:[
+      {q:"E aí?",qp:"e ai",qt:"Co słychać?",a:"Tudo bem! E você?",ap:"tudu bejng! e wose",at:"Wszystko dobrze! A ty?"},
+      {q:"Cara!",qp:"kara",qt:"Stary!",a:"Cara, que foi isso?",ap:"kara, ki foi isu",at:"Stary, co to było?"},
+      {q:"Que saudade!",qp:"ki saudadzi",qt:"Tęskniłem!",a:"Eu também! Quanto tempo!",ap:"eu tambejng! kwantu tejngpu",at:"Ja też! Ile czasu!"},
+      {q:"Valeu!",qp:"waleu",qt:"Dzięki!",a:"De nada!",ap:"dzi nada",at:"Nie ma za co!"},
+      {q:"Que massa!",qp:"ki masa",qt:"Ale fajnie!",a:"Massa demais!",ap:"masa dimais",at:"Naprawdę fajnie!"},
+      {q:"Tá ligado?",qp:"ta ligadu",qt:"Wiesz o co chodzi?",a:"Tô ligado, sim!",ap:"to ligadu, sing",at:"Tak, wiem!"},
+      {q:"Mano!",qp:"manu",qt:"Kolego!",a:"Que foi, mano?",ap:"ki foi, manu",at:"Co jest, kolego?"},
+      {q:"Saudades!",qp:"saudadzis",qt:"Tęsknię!",a:"Eu também tenho saudades!",ap:"eu tambejng tenhu saudadzis",at:"Ja też tęskniłem!"},
+      {q:"Tchau!",qp:"tszau",qt:"Pa!",a:"Tchau! Até mais!",ap:"tszau! ate mais",at:"Pa! Na razie!"},
+      {q:"Que show!",qp:"ki szou",qt:"Ekstra!",a:"Show de bola!",ap:"szou dzi bola",at:"Naprawdę ekstra!"}
+    ]},
+    mistakes:{title:"Nieporozumienia",phrases:[
+      {q:"Não entendi.",qp:"nau entejndzi",qt:"Nie rozumiem.",a:"Pode me explicar?",ap:"podzi mi eksplikar",at:"Możesz wyjaśnić?"},
+      {q:"Pode falar mais devagar?",qp:"podzi falar mais dewagar",qt:"Wolniej?",a:"Sim, desculpe! Assim?",ap:"sing, deskupli! aszing",at:"Tak, przepraszam!"},
+      {q:"Como se diz isso em português?",qp:"komu si dziz isu ej portugejs",qt:"Jak to po portugalsku?",a:"Espera, vou te dizer...",ap:"espera, wou tzi dizer",at:"Chwila, powiem ci..."},
+      {q:"Cometi um erro.",qp:"kometi ung eru",qt:"Popełniłem błąd.",a:"Não tem problema! É assim que aprendemos.",ap:"nau tejng problema! e aszing ki aprendemos",at:"Nic się nie stało!"},
+      {q:"Pode escrever isso?",qp:"podzi eskrewer isu",qt:"Możesz napisać?",a:"Claro, um momento.",ap:"klaru, ung momentu",at:"Oczywiście."},
+      {q:"Não sei como dizer isso.",qp:"nau sej komu dizer isu",qt:"Nie wiem jak powiedzieć.",a:"Não se preocupe, tente!",ap:"nau si preokupe, tentzi",at:"Nie martw się, spróbuj!"},
+      {q:"O que você quer dizer?",qp:"u ki wose ker dizer",qt:"Co masz na myśli?",a:"Me explica um pouco mais.",ap:"mi ekspika ung pouku mais",at:"Wyjaśnij więcej."},
+      {q:"Desculpe, não ouvi.",qp:"deskupli, nau ouvi",qt:"Nie słyszałem.",a:"Tudo bem, vou repetir.",ap:"tudu bejng, wou repetir",at:"Nic się nie stało, powtórzę."}
+    ]},
+    work:{title:"Praca — Steward",phrases:[
+      {q:"Bem-vindos ao nosso voo!",qp:"bejng windus au nosu wou",qt:"Witamy na pokładzie!",a:"Estamos felizes em tê-los conosco hoje.",ap:"estamos feliziis ej te-lus konusku odze",at:"Cieszymy się, że jesteście z nami."},
+      {q:"Por favor, afivele o cinto de segurança.",qp:"pur faworr, afiweli u sintu dzi seguransa",qt:"Prosimy zapiąć pasy.",a:"Obrigado pela cooperação.",ap:"obrigadu pela kooperasaung",at:"Dziękujemy za współpracę."},
+      {q:"Gostaria de algo para beber?",qp:"gustaria dzi algu para beber",qt:"Coś do picia?",a:"Temos água, suco, refrigerante e café.",ap:"temus agua, suku, refrigerantzi i kafe",at:"Woda, sok, napoje, kawa."},
+      {q:"Gostaria de algo para comer?",qp:"gustaria dzi algu para komer",qt:"Coś do jedzenia?",a:"Vou trazer o cardápio.",ap:"wou trazer u kardapiu",at:"Przyniosę menu."},
+      {q:"Precisa de ajuda com a bagagem?",qp:"presiza dzi adżuda kong a bagadżeng",qt:"Pomoc z bagażem?",a:"Deixe-me ajudá-lo.",ap:"dejksi-mi adżuda-lu",at:"Pomogę."},
+      {q:"Por favor, desligue os dispositivos eletrônicos.",qp:"pur faworr, desligi us dispozitiwus eletronikus",qt:"Prosimy wyłączyć urządzenia.",a:"Obrigado pela compreensão.",ap:"obrigadu pela kompreensaung",at:"Dziękujemy za zrozumienie."},
+      {q:"Está bem? Posso ajudar?",qp:"esta bejng? posu adżudar",qt:"Wszystko dobrze?",a:"Estou aqui para servi-los.",ap:"estou akwi para servi-lus",at:"Jestem do dyspozycji."},
+      {q:"Bem-vindos à chegada!",qp:"bejng windus a szegada",qt:"Witamy po przylocie!",a:"Espero que tenham tido uma boa viagem.",ap:"esperu ki tenjang tidu uma boa wiadżeng",at:"Mam nadzieję na przyjemną podróż."},
+      {q:"Obrigado por voar conosco.",qp:"obrigadu pur woar konusku",qt:"Dziękujemy za wybranie naszego lotu.",a:"Esperamos vê-los novamente em breve!",ap:"esperamos we-lus nowamentzi ej brevi",at:"Do zobaczenia!"}
+    ]},
+    bye:{title:"Pożegnanie",phrases:[
+      {q:"Tchau!",qp:"tszau",qt:"Do widzenia!",a:"Tchau! Boa viagem!",ap:"tszau! boa wiadżeng",at:"Do widzenia! Dobrej podróży!"},
+      {q:"Até logo!",qp:"ate logu",qt:"Do zobaczenia!",a:"Sim, até logo!",ap:"sing, ate logu",at:"Do zobaczenia wkrótce!"},
+      {q:"Foi um prazer te conhecer!",qp:"foi ung prazer tzi konjuser",qt:"Miło cię było poznać!",a:"Igualmente! Até logo!",ap:"igualmenti! ate logu",at:"Wzajemnie!"},
+      {q:"Boa noite!",qp:"boa nojti",qt:"Dobranoc!",a:"Igualmente! Durma bem!",ap:"igualmenti! durma bejng",at:"Dobranoc!"},
+      {q:"Foi ótimo conversar com você!",qp:"foi otimu konwersar kong wose",qt:"Świetnie było rozmawiać!",a:"Igualmente! Até a próxima!",ap:"igualmenti! ate a proksima",at:"Wzajemnie! Do następnego razu!"}
+    ]}
+  }},
+  tr:{color:"#dc2626",flag:"🇹🇷",name:"Turecki",categories:{
+    greet:{title:"Powitanie",phrases:[
+      {q:"Merhaba! Nasılsın?",qp:"merhaba! nasylsyn",qt:"Cześć! Jak się masz?",a:"İyiyim, teşekkürler! Ya sen?",ap:"ijjim, teszekkyrleer! ja sen",at:"Dobrze, dziękuję! A ty?"},
+      {q:"Adın ne?",qp:"adyn ne",qt:"Jak masz na imię?",a:"Adım Kacper. Senin adın?",ap:"adym Kasper. senin adyn",at:"Jestem Kacper. A ty?"},
+      {q:"Nerelisin?",qp:"nerelisin",qt:"Skąd jesteś?",a:"Polonya'nın Gdynia şehrindenim. Sen?",ap:"Polonja nyn Gdinia szehrindenim. sen",at:"Z Gdyni w Polsce. A ty?"},
+      {q:"Kaç yaşındasın?",qp:"kacz jaszyndasyn",qt:"Ile masz lat?",a:"Yirmi yedi yaşındayım. Sen?",ap:"jirmi jedi jaszymdajym. sen",at:"27 lat. A ty?",v:["Yirmi beş yaşındayım. – 25 lat.","Otuz yaşındayım. – 30 lat.","Yaşımı göstermiyorum! – Nie wyglądam na swój wiek!"]},
+      {q:"Buradan mısın?",qp:"buradan mysyn",qt:"Jesteś stąd?",a:"Hayır, Polonya'danım. Sen nerelisin?",ap:"hajyr, Polonja danyn. sen nerelisin",at:"Nie, jestem z Polski. A ty?"}
+    ]},
+    info:{title:"Kim jestem",phrases:[
+      {q:"Ne iş yapıyorsun?",qp:"ne isz japyjorsun",qt:"Czym się zajmujesz?",a:"Gdynia limanında çalışıyorum. Trading hobim. 43 ülke gezdim ve 5 dil öğreniyorum. Sen?",ap:"Gdinia limanynda czalyszyjorom. trading hobim. kyrk usz ylke gezdim we besz dil ogrenijorom. sen",at:"Pracuję w porcie. Trading to moje hobby. 43 kraje, 5 języków. A ty?"},
+      {q:"Çalışıyor musun, yoksa öğrenci misin?",qp:"czalyszyjor musun, joksa ogrenci misin",qt:"Pracujesz czy studiujesz?",a:"Çalışıyorum. Sen?",ap:"czalyszyjorum. sen",at:"Pracuję. A ty?"},
+      {q:"Tam olarak nerede yaşıyorsun?",qp:"tam olarak nerede jaszyjorun",qt:"Gdzie mieszkasz?",a:"Gdansk yakınındaki Gdynia'da yaşıyorum.",ap:"Gdansk jakynymdaki Gdinia da jaszyjorom",at:"W Gdyni, blisko Gdańska."},
+      {q:"Kardeşin var mı?",qp:"kardesyin war my",qt:"Masz rodzeństwo?",a:"Evet, bir kız kardeşim var. Sen?",ap:"ewet, bir kyz kardesyim war. sen",at:"Tak, mam siostrę. A ty?"},
+      {q:"Başka bir ülkede yaşadın mı?",qp:"baszka bir ylkede jaszadyn my",qt:"Mieszkałeś za granicą?",a:"Hayır, ama çok seyahat ettim. Sen?",ap:"hajyr, ama czok sejajat ettim. sen",at:"Nie, ale dużo podróżowałem. A ty?"}
+    ]},
+    hobby:{title:"Hobby",phrases:[
+      {q:"Boş zamanında ne yaparsın?",qp:"bosz zamanynda ne japarszyn",qt:"Co robisz w wolnym czasie?",a:"Video oyunu oynarım, dizi izlerim ve spor salonuna giderim.",ap:"wideo ojunu ojnarym, dizi izlerim we spor salonuna giderim",at:"Gram w gry, oglądam seriale i chodzę na siłownię."},
+      {q:"Spor yapıyor musun?",qp:"spor japyjor musun",qt:"Uprawiasz sport?",a:"Evet, düzenli olarak spor salonuna gidiyorum. Sen?",ap:"ewet, dyzzenli olarak spor salonuna gidijorom. sen",at:"Tak, regularnie. A ty?"},
+      {q:"Ne tür müzik dinlersin?",qp:"ne tyr myzik dinlersin",qt:"Jakiej muzyki słuchasz?",a:"Rap, pop ve rock seviyorum. Sen?",ap:"rap, pop we rok sewijorom. sen",at:"Rap, pop, rock. A ty?"},
+      {q:"Seyahat etmeyi seviyor musun?",qp:"sejajat etmei sewijor musun",qt:"Lubisz podróżować?",a:"Evet, çok! 43 ülke gezdim.",ap:"ewet, czok! kyrk usz ylke gezdim",at:"Tak, bardzo! 43 kraje."},
+      {q:"Hangi dizileri izliyorsun?",qp:"hangi diziijeri izlijorun",qt:"Jakie seriale?",a:"Netflix ve HBO'da dizi izliyorum. Sen?",ap:"Netflix we HBO da dizi izlijorom. sen",at:"Netflix i HBO. A ty?"},
+      {q:"Video oyunu oynuyor musun?",qp:"wideo ojunu ojnujor musun",qt:"Grasz w gry?",a:"Evet, çok! Çoğunlukla PC'de.",ap:"ewet, czok! czoggunlukla PC de",at:"Tak, dużo! Głównie PC."}
+    ]},
+    why:{title:"Dlaczego uczę się",phrases:[
+      {q:"Neden Türkçe öğreniyorsun?",qp:"neden Tyrkcze ogrenijorun",qt:"Dlaczego uczysz się tureckiego?",a:"Türk kültürünü seviyorum ve Türkiye'yi gezmek istiyorum.",ap:"Tyrk kyltyryyny sewijorom we Tyrkijeji gezmek istijorom",at:"Lubię kulturę turecką i chcę pojechać do Turcji."},
+      {q:"Ne zamandır Türkçe öğreniyorsun?",qp:"ne zamandir Tyrkcze ogrenijorun",qt:"Jak długo uczysz się?",a:"Birkaç haftadır. Yeni başladım.",ap:"birkacz haftadyr. jeni basladym",at:"Kilka tygodni. Właśnie zacząłem."},
+      {q:"Dili nasıl öğreniyorsun?",qp:"dili nasyl ogrenijorun",qt:"Jak uczysz się języka?",a:"Uygulamalar, videolar ve anadil konuşanlarla konuşarak.",ap:"ujgulamalar, wideolar we anadil konuszanlarla konuszarak",at:"Aplikacje, filmy, native speakerzy."},
+      {q:"Türkiye'yi ziyaret etmek istiyor musun?",qp:"Tyrkijei zijaret etmek istijoron musun",qt:"Chcesz odwiedzić Turcję?",a:"Evet, çok! Özellikle İstanbul.",ap:"ewet, czok! ozellikle Istanbul",at:"Tak, bardzo! Szczególnie Stambuł."},
+      {q:"Başka diller de öğreniyor musun?",qp:"baszka diller de ogrenijoron musun",qt:"Uczysz się innych języków?",a:"Evet, toplam beş dil öğreniyorum.",ap:"ewet, toplam besz dil ogrenijorom",at:"Tak, pięciu łącznie."},
+      {q:"Türkçe zor mu?",qp:"Tyrkcze zor mu",qt:"Czy turecki jest trudny?",a:"Fiil çekimi en zor kısmı!",ap:"fiil czekimi en zor kysmyi",at:"Odmiana czasowników!"},
+      {q:"Türkçen nasıl gidiyor?",qp:"Tyrkzczen nasyl gidijoron",qt:"Jak idzie ci turecki?",a:"Sadece biraz Türkçe konuşabiliyorum. Her gün öğreniyorum.",ap:"sadecze biraz Tyrkcze konuszabilijorum. her gyn ogrenijorom",at:"Tylko trochę gadam. Uczę się codziennie."}
+    ]},
+    travel:{title:"Podróże",phrases:[
+      {q:"Çok seyahat ettin mi?",qp:"czok sejajat ettin mi",qt:"Dużo podróżowałeś?",a:"Evet, 43 ülke gezdim. Sen?",ap:"ewet, kyrk usz ylke gezdim. sen",at:"Tak, 43 kraje. A ty?"},
+      {q:"En çok hangi ülkeyi sevdin?",qp:"en czok hangi ylkeji sewdin",qt:"Który kraj najlepszy?",a:"İspanya harikaydı! Üç kez gittim.",ap:"Ispanja harikajdy! ycz kez gittim",at:"Hiszpania! Byłem trzy razy."},
+      {q:"Daha fazla seyahat etmek istiyor musun?",qp:"daha fazla sejajat etmek istijoron musun",qt:"Więcej podróżować?",a:"Evet, tüm ülkeleri ziyaret etmek istiyorum!",ap:"ewet, tym ylkeleri zijaret etmek istijorom",at:"Tak, wszystkie kraje!"},
+      {q:"Hangi ülkeyi ziyaret etmek istiyorsun?",qp:"hangi ylkeji zijaret etmek istijorunsun",qt:"Który kraj chcesz odwiedzić?",a:"Japonya ve Kore'ye gitmek istiyorum.",ap:"Japonja we Koreje gitmek istijorom",at:"Japonię i Koreę."},
+      {q:"Seyahat ederken nerede kalırsın?",qp:"sejajat ederken nerede kalyrszyn",qt:"Gdzie mieszkasz gdy podróżujesz?",a:"Genellikle oteller veya Airbnb'de.",ap:"genellikle oteller weja Airbnb de",at:"Hotel lub Airbnb."},
+      {q:"Yalnız mı seyahat edersin?",qp:"jalnytz my sejajat edersin",qt:"Podróżujesz sam?",a:"Genellikle yalnız, ama arkadaşlarımla da.",ap:"genellikle jalnytz, ama arkadaszlarymla da",at:"Często sam, też z przyjaciółmi."},
+      {q:"En sevdiğin yer neresi?",qp:"en sewdigyin jer neresi",qt:"Ulubione miejsce?",a:"Barselona harikaydı.",ap:"Barselona harikajdy",at:"Barcelona."},
+      {q:"Ne kadar seyahat edersin?",qp:"ne kadar sejajat edersin",qt:"Jak długo?",a:"Genellikle her seferinde bir-iki hafta.",ap:"genellikle her seferinde bir iki hafta",at:"Tydzień-dwa za każdym razem."},
+      {q:"Türkiye'ye hiç gittin mi?",qp:"Tyrkijeje hicz gittin mi",qt:"Byłeś w Turcji?",a:"Henüz hayır, ama planlıyorum!",ap:"henytz hajyr, ama planlyjorom",at:"Jeszcze nie, ale planuję!"}
+    ]},
+    react:{title:"Reakcje",phrases:[
+      {q:"Harika!",qp:"harika",qt:"Świetnie!",a:"Evet, gerçekten!",ap:"ewet, gerczekten",at:"Tak, rzeczywiście!"},
+      {q:"Gerçekten mi?",qp:"gerczekten mi",qt:"Naprawdę?",a:"Evet, gerçekten!",ap:"ewet, gerczekten",at:"Tak, serio!"},
+      {q:"Çok güzel!",qp:"czok gyzel",qt:"Bardzo ładnie!",a:"Beğendiğine sevindim!",ap:"beggendigine sewinding",at:"Cieszę się!"},
+      {q:"Katılıyorum!",qp:"katylyjorum",qt:"Zgadzam się!",a:"Ben de aynı şeyi düşünüyorum.",ap:"ben de ajny szjeji dyszynyjorum",at:"Ja też tak myślę."},
+      {q:"Çok yazık!",qp:"czok jazyik",qt:"Szkoda!",a:"Evet, yazık oldu.",ap:"ewet, jazyk oldu",at:"Tak, szkoda."},
+      {q:"Etkileyici!",qp:"etkilejidzi",qt:"Imponujące!",a:"Etkilendi mi?",ap:"etkilendi mi",at:"Robi wrażenie?"},
+      {q:"İnanamıyorum!",qp:"inanamyjorum",qt:"Nie wierzę!",a:"Gerçek bu, inan!",ap:"gerczek bu, inan",at:"Naprawdę!"},
+      {q:"Ne kadar ilginç!",qp:"ne kadar ilgindsz",qt:"Interesujące!",a:"Evet, çok ilginç.",ap:"ewet, czok ilgindsz",at:"Bardzo interesujące."},
+      {q:"Ne tesadüf!",qp:"ne tesadyf",qt:"Co za zbieg!",a:"Evet, inanılmaz!",ap:"ewet, inanyilmaz",at:"Niesamowite!"},
+      {q:"Çok beğendim!",qp:"czok beggendim",qt:"Bardzo mi się podoba!",a:"Sevindim!",ap:"sewindim",at:"Cieszę się!"},
+      {q:"Ciddi misin?",qp:"dziddi misin",qt:"Mówisz poważnie?",a:"Evet, tamamen ciddi!",ap:"ewet, tamamen dziddi",at:"Całkowicie poważnie!"},
+      {q:"Bu nasıl mümkün?",qp:"bu nasyl mymkyn",qt:"Jak to możliwe?",a:"Ben de anlamıyorum!",ap:"ben de anlamyjorum",at:"Sam nie rozumiem!"},
+      {q:"Bu çılgınca!",qp:"bu czylgyndza",qt:"To szalone!",a:"Biliyorum, inanılmaz!",ap:"bilijorom, inanyilmaz",at:"Wiem, niesamowite!"},
+      {q:"Haklısın!",qp:"haklyiszyn",qt:"Masz rację!",a:"Teşekkürler, takdir ediyorum.",ap:"teszekkyrleer, takdir edijorom",at:"Dziękuję."},
+      {q:"Güzel fikir!",qp:"gyzel fikir",qt:"Dobry pomysł!",a:"Beğendiğine sevindim!",ap:"beggendigne sewinding",at:"Cieszę się!"},
+      {q:"Kişiliğin beni etkiliyor!",qp:"kisziligyin beni etkilijoron",qt:"Twoja osobowość robi wrażenie!",a:"Çok teşekkür ederim, bu beni mutlu ediyor!",ap:"czok teszekky ederim, bu beni mutlu edijoron",at:"Dziękuję, to mnie cieszy!"}
+    ]},
+    past:{title:"Przeszłość",phrases:[
+      {q:"Hafta sonu ne yaptın?",qp:"hafta sonu ne japtyn",qt:"Co robiłeś w weekend?",a:"Video oyunu oynadım ve dizi izledim.",ap:"wideo ojunu ojnadym we dizi izledim",at:"Grałem w gry i oglądałem seriale."},
+      {q:"Son zamanlarda nereye seyahat ettin?",qp:"son zamanlarda nereje sejajat ettin",qt:"Gdzie ostatnio byłeś?",a:"Geçen ay İspanya'ya gittim.",ap:"geczen aj Ispanjaja gittim",at:"Hiszpania w zeszłym miesiącu."},
+      {q:"Ne okudun/öğrendin?",qp:"ne okudun/ogrrendin",qt:"Co studiowałeś?",a:"Okumadım, erken çalışmaya başladım.",ap:"okumadym, erken czalyszmmaja basladym",at:"Nie studiowałem, pracuję od młodości."},
+      {q:"Nerede büyüdün?",qp:"nerede byyjydyn",qt:"Gdzie dorastałeś?",a:"Deniz kenarında Gdynia'da büyüdüm.",ap:"deniz kenarynda Gdinia da byyjydym",at:"W Gdyni, blisko morza."},
+      {q:"En iyi seyahatin neydi?",qp:"en ijji sejajatin nejdi",qt:"Najlepsza podróż?",a:"İspanya — üç kez gittim!",ap:"Ispanja — ycz kez gittim",at:"Hiszpania — trzy razy!"},
+      {q:"Daha önce başka bir dil öğrendin mi?",qp:"daha ynce baszka bir dil ogrrendin mi",qt:"Uczyłeś się wcześniej?",a:"Evet, küçüklüğümden beri İngilizce.",ap:"ewet, kyczyklygymden beri Ingilizce",at:"Tak, angielski od dziecka."},
+      {q:"Dün ne yaptın?",qp:"dyn ne japtyn",qt:"Co robiłeś wczoraj?",a:"Çalıştım ve sonra spor salonuna gittim.",ap:"czalystym we sonra spor salonuna gittim",at:"Praca, potem siłownia."},
+      {q:"Buraya ne zaman geldin?",qp:"buraja ne zaman geldin",qt:"Kiedy tu przyjechałeś?",a:"Yakın zamanda geldim, birkaç günlüğüne.",ap:"jakin zamanda geldim, birkacz gynlygyne",at:"Niedawno, na kilka dni."},
+      {q:"Seyahatte en çok neyi sevdin?",qp:"sejajatte en czok neji sewdin",qt:"Co najlepsze?",a:"Yemekleri ve insanları.",ap:"jemekleri we insanlary",at:"Kuchnia i ludzie."},
+      {q:"İlginç insanlarla tanıştın mı?",qp:"Ilgindz insanlarla tanyszhtyn my",qt:"Ciekawi ludzie?",a:"Evet, çoğu! Bu seyahatin en güzel yanı.",ap:"ewet, czoggu! bu sejajatin en gyzel jany",at:"Tak, wielu! To najlepsze w podróżowaniu."},
+      {q:"Komik bir anın oldu mu?",qp:"komik bir anyn oldu mu",qt:"Śmieszne zdarzenie?",a:"Evet, bir keresinde yabancı bir şehirde kayboldum!",ap:"ewet, bir kereszinde jabandzy bir szehirde kajboldum",at:"Tak, raz zgubiłem się!"}
+    ]},
+    future:{title:"Przyszłość",phrases:[
+      {q:"Planların neler?",qp:"planlarzyn neler",qt:"Jakie plany?",a:"Seyahat etmeye ve dil öğrenmeye devam etmek istiyorum.",ap:"sejajat etmeje we dil ogrenmeje dewam etmek istijorom",at:"Podróżować i uczyć się języków."},
+      {q:"Yurt dışında yaşamak ister misin?",qp:"jurt dyszyjnda jaszemak ister misin",qt:"Mieszkać za granicą?",a:"Belki bir süreliğine, evet.",ap:"belki bir syreliggine, ewet",at:"Może przez jakiś czas."},
+      {q:"... yapmayı planlıyorum",qp:"japmajy planlyjorom",qt:"Mam zamiar...",a:"Bu yıl Türkiye'yi ziyaret etmeyi planlıyorum.",ap:"bu jyl Tyrkijei zijaret etmejiy planlyjorom",at:"Mam zamiar odwiedzić Turcję w tym roku."},
+      {q:"Planların neler?",qp:"planlarzyn neler",qt:"Twoje plany?",a:"Yeni ülkeler gezmek ve yeni diller öğrenmek.",ap:"jeni ylkeler gezmek we jeni diller ogrenmek",at:"Nowe kraje, nowe języki."},
+      {q:"Yarın ne yapacaksın?",qp:"jaryn ne japadżaksyn",qt:"Co jutro?",a:"İşe gidip sonra spor salonuna gideceğim.",ap:"iszje gidip sonra spor salonuna gidedżegim",at:"Praca, potem siłownia."},
+      {q:"Tatilde nereye gideceksin?",qp:"tatilde nereje gidedżeksin",qt:"Wakacje?",a:"Bu yıl Asya'ya gitmeyi düşünüyorum.",ap:"bu jyl Asjaja gitmejiy dyszynyjorum",at:"Azja w tym roku."},
+      {q:"Sonra hangi dili öğreneceksin?",qp:"sonra hangi dili ogrrenedżeksin",qt:"Następny język?",a:"Japonca veya Korece düşünüyorum.",ap:"Japonca weja Korece dyszynyjorum",at:"Japoński lub koreański."}
+    ]},
+    numbers:{title:"Liczby i czas",phrases:[
+      {q:"Saat kaç?",qp:"saat kacz",qt:"Która godzina?",a:"Saat üçbuçuk. / Tam bir.",ap:"saat yczbuczu. / tam bir",at:"Wpół do czwartej / dokładnie pierwsza."},
+      {q:"Bugün günlerden ne?",qp:"bugyn gynlerden ne",qt:"Jaki dzień?",a:"Bugün Pazartesi / Salı / Çarşamba...",ap:"bugyn Pazartesi / Sally / Czarszamba",at:"Poniedziałek / wtorek / środa..."},
+      {q:"Haftanın günleri",qp:"haftanyn gynleri",qt:"Dni tygodnia",a:"Pazartesi, Salı, Çarşamba, Perşembe, Cuma, Cumartesi, Pazar",ap:"Pazartesi, Sally, Czarszamba, Perszembe, Dżuma, Dżumartesi, Pazar",at:"Pn, Wt, Śr, Cz, Pt, Sb, Nd"},
+      {q:"Bu ne kadar?",qp:"bu ne kadar",qt:"Ile kosztuje?",a:"Bu ne kadar? — On euro.",ap:"bu ne kadar — on euro",at:"Ile to? — Dziesięć euro."},
+      {q:"Aylar",qp:"ajlar",qt:"Miesiące",a:"Ocak, Şubat, Mart, Nisan, Mayıs, Haziran, Temmuz, Ağustos, Eylül, Ekim, Kasım, Aralık",ap:"Odżak, Szubat, Mart, Nisan, Majys, Haziran, Temmuz, Agustos, Ejlyl, Ekim, Kasym, Aralyik",at:"Styczeń, luty, marzec..."},
+      {q:"Sayılar: 1-20",qp:"sajylar: 1-20",qt:"Liczby: 1-20",a:"Bir, iki, üç, dört, beş, altı, yedi, sekiz, dokuz, on, on bir, on iki, on üç, on dört, on beş, on altı, on yedi, on sekiz, on dokuz, yirmi",ap:"bir, iki, ycz, dyrt, besz, althy, jedi, sekiz, dokuz, on, on bir, on iki, on ycz, on dyrt, on besz, on althy, on jedi, on sekiz, on dokuz, jirmi",at:"1-20 po turecku"},
+      {q:"Sayılar: 30-100",qp:"sajylar: 30-100",qt:"Liczby: 30-100",a:"Otuz (30), kırk (40), elli (50), altmış (60), yetmiş (70), seksen (80), doksan (90), yüz (100)",ap:"otuz, kyrk, elli, altmysz, jetmisz, seksen, doksan, jyz",at:"30-100 po turecku"},
+      {q:"Ne zamandır buradasın?",qp:"ne zamandir buradasyn",qt:"Jak długo tu jesteś?",a:"Bir haftadır buradayım. Sen?",ap:"bir haftadyr buradajym. sen",at:"Tydzień. A ty?"}
+    ]},
+    slang:{title:"Slang",phrases:[
+      {q:"Naber?",qp:"naber",qt:"Co słychać?",a:"İyilik! Sen?",ap:"ijijlik! sen",at:"Wszystko dobrze! A ty?"},
+      {q:"Kanka!",qp:"kanka",qt:"Koleś!",a:"Kanka, ne haber?",ap:"kanka, ne haber",at:"Stary, co słychać?"},
+      {q:"Süper!",qp:"syper",qt:"Super!",a:"Gerçekten süper!",ap:"gerczekten syper",at:"Naprawdę super!"},
+      {q:"Çok şaka!",qp:"czok szaka",qt:"Żartujesz!",a:"Şaka yapmıyorum, ciddi!",ap:"szaka japmyjorum, dziddi",at:"Nie żartuję, serio!"},
+      {q:"Off ya!",qp:"off ja",qt:"O rany!",a:"Off ya, ne oldu?",ap:"off ja, ne oldu",at:"O rany, co się stało?"},
+      {q:"Hayırlısı!",qp:"hajyrlysy",qt:"Wszystko dobrze!",a:"Hayırlısı, sağ ol!",ap:"hajyrlysy, sag ol",at:"Dzięki!"},
+      {q:"Yok artık!",qp:"jok artyk",qt:"Niemożliwe!",a:"Yok artık, gerçek mi?",ap:"jok artyk, gerczek mi",at:"Naprawdę?"},
+      {q:"Tamam tamam!",qp:"tamam tamam",qt:"Okej okej!",a:"Tamam, anladım!",ap:"tamam, anladym",at:"Okej, rozumiem!"},
+      {q:"Görüşürüz!",qp:"goryszyryz",qt:"Do zobaczenia!",a:"Görüşürüz, kolay gelsin!",ap:"goryszyryz, kolaj gelsin",at:"Do zobaczenia!"},
+      {q:"Fena değil!",qp:"fena degil",qt:"Nieźle!",a:"Gerçekten fena değil!",ap:"gerczekten fena degil",at:"Naprawdę nieźle!"}
+    ]},
+    mistakes:{title:"Nieporozumienia",phrases:[
+      {q:"Anlamıyorum.",qp:"anlamyjorum",qt:"Nie rozumiem.",a:"Açıklayabilir misin?",ap:"aczyklajaabilir misin",at:"Możesz wyjaśnić?"},
+      {q:"Daha yavaş konuşabilir misin?",qp:"daha jawasz konuszabilir misin",qt:"Wolniej?",a:"Evet, özür dilerim! Böyle mi?",ap:"ewet, ozyr dilerim! bojle mi",at:"Tak, przepraszam!"},
+      {q:"Türkçede bu nasıl denir?",qp:"Tyrkczede bu nasyl denir",qt:"Jak to po turecku?",a:"Bekle, söyleyeyim...",ap:"bekle, sojlejejim",at:"Chwila, powiem ci..."},
+      {q:"Hata yaptım.",qp:"hata japtym",qt:"Popełniłem błąd.",a:"Sorun değil! Böyle öğreniyoruz.",ap:"sorun degil! bojle ogrenijorom",at:"Nic się nie stało!"},
+      {q:"Bunu yazabilir misin?",qp:"bunu jazabilir misin",qt:"Możesz napisać?",a:"Tabii, bir dakika.",ap:"tabii, bir dakika",at:"Oczywiście."},
+      {q:"Bunu nasıl söyleyeceğimi bilmiyorum.",qp:"bunu nasyl sojlejedżegimi bilmijorum",qt:"Nie wiem jak powiedzieć.",a:"Endişelenme, dene!",ap:"endiszzellenme, dene",at:"Nie martw się, spróbuj!"},
+      {q:"Ne demek istiyorsun?",qp:"ne demek istijorusun",qt:"Co masz na myśli?",a:"Biraz daha açıklar mısın?",ap:"biraz daha aczyklar mysyn",at:"Wyjaśnij więcej."},
+      {q:"Özür dilerim, duymadım.",qp:"ozyr dilerim, dujmadym",qt:"Nie słyszałem.",a:"Sorun değil, tekrar söyleyeyim.",ap:"sorun degil, tekrar sojlejejim",at:"Nic się nie stało, powtórzę."}
+    ]},
+    work:{title:"Praca — Steward",phrases:[
+      {q:"Uçuşumuza hoş geldiniz!",qp:"uczuszumuza hoszcz geldiniz",qt:"Witamy na pokładzie!",a:"Bugün bizimle olduğunuz için teşekkürler.",ap:"bugyn bizimle olduggunuz iczin teszekkyrleer",at:"Dziękujemy za podróż z nami."},
+      {q:"Lütfen emniyet kemerlerinizi bağlayın.",qp:"lytfen emnijet kemerlerinizi baglajyn",qt:"Prosimy zapiąć pasy.",a:"İşbirliğiniz için teşekkürler.",ap:"iszbirligginiz iczin teszekkyrleer",at:"Dziękujemy za współpracę."},
+      {q:"İçmek ister misiniz?",qp:"iczmek ister misiniz",qt:"Coś do picia?",a:"Su, meyve suyu, meşrubat ve kahvemiz var.",ap:"su, mejwe suju, meszrubat we kahwemiz war",at:"Woda, sok, napoje, kawa."},
+      {q:"Yemek ister misiniz?",qp:"jemek ister misiniz",qt:"Coś do jedzenia?",a:"Menüyü getireyim.",ap:"menyjy getireijim",at:"Przyniosę menu."},
+      {q:"Bagajınızda yardıma ihtiyacınız var mı?",qp:"bagadżynyzda jardyma ihtijadżynyz war my",qt:"Pomoc z bagażem?",a:"Size yardım etmeme izin verin.",ap:"size jardym etmeme izin werin",at:"Pomogę."},
+      {q:"Lütfen elektronik cihazlarınızı kapatın.",qp:"lytfen elektronik dżihazlarynyzzy kapatyn",qt:"Prosimy wyłączyć urządzenia.",a:"Anlayışınız için teşekkürler.",ap:"anlajyszzynyz iczin teszekkyrleer",at:"Dziękujemy za zrozumienie."},
+      {q:"İyi misiniz? Yardımcı olabilir miyim?",qp:"ijji misiniz? jardymdzy olabilir mijim",qt:"Wszystko dobrze?",a:"Size hizmet etmek için buradayım.",ap:"size hizmet etmek iczin buradajym",at:"Jestem do dyspozycji."},
+      {q:"Hoş geldiniz!",qp:"hoszcz geldiniz",qt:"Witamy po przylocie!",a:"Umarım keyifli bir yolculuk geçirmişsinizdir.",ap:"umarym kejifli bir joldzulluk geczirmiszsinizdir",at:"Mam nadzieję na przyjemną podróż."},
+      {q:"Uçuşumuzu tercih ettiğiniz için teşekkürler.",qp:"uczuszumuzu terdzih ettigginiz iczin teszekkyrleer",qt:"Dziękujemy za wybranie naszego lotu.",a:"Sizi tekrar görmek umarız!",ap:"sizi tekrar gyrmek umaryz",at:"Do zobaczenia!"}
+    ]},
+    bye:{title:"Pożegnanie",phrases:[
+      {q:"Hoşça kal!",qp:"hoszcza kal",qt:"Do widzenia!",a:"Hoşça kal! İyi yolculuklar!",ap:"hoszcza kal! ijji joldzulluklar",at:"Do widzenia! Dobrej podróży!"},
+      {q:"Görüşürüz!",qp:"goryszyryz",qt:"Do zobaczenia!",a:"Evet, yakında görüşürüz!",ap:"ewet, jakynda goryszyryz",at:"Do zobaczenia wkrótce!"},
+      {q:"Tanışmak güzeldi!",qp:"tanyszmak gyzeldi",qt:"Miło cię było poznać!",a:"Ben de! Görüşürüz!",ap:"ben de! goryszyryz",at:"Wzajemnie!"},
+      {q:"İyi geceler!",qp:"ijji dżedżeler",qt:"Dobranoc!",a:"Sana da! İyi uykular!",ap:"sana da! ijji ujkular",at:"Dobranoc!"},
+      {q:"Seninle konuşmak güzeldi!",qp:"seninle konuszmak gyzeldi",qt:"Świetnie było rozmawiać!",a:"Ben de! Bir dahaki sefere!",ap:"ben de! bir dahaki sefere",at:"Wzajemnie! Do następnego razu!"}
+    ]}
+  }}
 };
 const FLOW={
   es:[
@@ -2786,6 +3536,11 @@ const LANG_CFG = {
   fr: { color:'#a855f7', soft:'rgba(168,85,247,.12)', bd:'rgba(168,85,247,.32)', flag:'🇫🇷' },
   ru: { color:'#ef4444', soft:'rgba(239,68,68,.12)',   bd:'rgba(239,68,68,.32)',   flag:'🇷🇺' },
   it: { color:'#22c55e', soft:'rgba(34,197,94,.12)',   bd:'rgba(34,197,94,.32)',   flag:'🇮🇹' },
+  el: { color:'#1d4ed8', soft:'rgba(29,78,216,.12)',   bd:'rgba(29,78,216,.32)',   flag:'🇬🇷' },
+  ja: { color:'#dc2626', soft:'rgba(220,38,38,.12)',   bd:'rgba(220,38,38,.32)',   flag:'🇯🇵' },
+  ko: { color:'#0284c7', soft:'rgba(2,132,199,.12)',   bd:'rgba(2,132,199,.32)',   flag:'🇰🇷' },
+  pt: { color:'#16a34a', soft:'rgba(22,163,74,.12)',   bd:'rgba(22,163,74,.32)',   flag:'🇵🇹' },
+  tr: { color:'#dc2626', soft:'rgba(220,38,38,.12)',   bd:'rgba(220,38,38,.32)',   flag:'🇹🇷' },
 };
 
 /* ═══════════════════════════════════════════════
@@ -2831,6 +3586,7 @@ function setLang(l, btn) {
   }
 
   lang = l; activeSc = null;
+  btn = btn || document.querySelector('.lang-btn[data-lang="'+l+'"]');
   clearSearch();
   document.querySelectorAll('.lang-btn').forEach(b => b.className = 'lang-btn');
   btn.classList.add('active-' + l);
@@ -3071,15 +3827,15 @@ function renderCats() {
         <div class="pcard-inner">
           <div class="pcard-col">
             <div class="pcard-tag">Pytanie / zwrot</div>
-            <div class="pcard-phrase">${p.q} ${ttsBtn(p.q,lang)}</div>
-            <div class="pcard-phonetic">${p.qp}</div>
+            <div class="pcard-phrase">${(lang==='ja'||lang==='ko')?p.qp:p.q} ${ttsBtn(p.q,lang)}</div>
+            <div class="pcard-phonetic">${(lang==='ja'||lang==='ko')?'<span class="ja-chars">'+p.q+'</span>':p.qp}</div>
             <div class="pcard-translation">${p.qt}</div>
           </div>
           <div class="pcard-sep"></div>
           <div class="pcard-col">
             <div class="pcard-tag">Twoja odpowiedź</div>
-            <div class="pcard-phrase">${p.a} ${ttsBtn(p.a,lang)}</div>
-            <div class="pcard-phonetic">${p.ap}</div>
+            <div class="pcard-phrase">${(lang==='ja'||lang==='ko')?p.ap:p.a} ${ttsBtn(p.a,lang)}</div>
+            <div class="pcard-phonetic">${(lang==='ja'||lang==='ko')?'<span class="ja-chars">'+p.a+'</span>':p.ap}</div>
             <div class="pcard-translation">${p.at}</div>
           </div>
         </div>
@@ -3252,6 +4008,11 @@ const TTS_CONFIG = {
   fr: { code:'fr', rate:0.80 },
   ru: { code:'ru', rate:0.77 },
   it: { code:'it', rate:0.82 },
+  el: { code:'el', rate:0.80 },
+  ja: { code:'ja', rate:0.78 },
+  ko: { code:'ko', rate:0.78 },
+  pt: { code:'pt', rate:0.82 },
+  tr: { code:'tr', rate:0.80 },
 };
 
 let ttsActive = null, ttsPlayId = 0;
@@ -3314,7 +4075,7 @@ updateCatsHeader();
 /* ═══════════════════════════════════════════════
    QUIZ ENGINE
 ═══════════════════════════════════════════════ */
-const LANG_NAMES = { es:'Hiszpańskim', de:'Niemieckim', fr:'Francuskim', ru:'Rosyjskim', it:'Włoskim' };
+const LANG_NAMES = { es:'Hiszpańskim', de:'Niemieckim', fr:'Francuskim', ru:'Rosyjskim', it:'Włoskim', el:'Greckim', ja:'Japońskim', ko:'Koreańskim', pt:'Portugalskim', tr:'Tureckim' };
 
 
 function toggleUnknownFilter() {
@@ -3324,6 +4085,7 @@ function toggleUnknownFilter() {
     btn.classList.toggle('active', showOnlyUnknown);
     btn.textContent = showOnlyUnknown ? '👁 Tylko nieznane' : '👁 Wszystkie';
   }
+  if (typeof renderMobileCatChips === 'function') renderMobileCatChips();
   renderCats();
   updateCatsHeader();
 }
@@ -4023,7 +4785,11 @@ function renderMobileCatChips() {
       `<button class="cat-chip-m ${(!isChapter && !isAll && catF===cat)?'active':''}" onclick="setCatMobile('${cat}')">
         ${CAT_ICONS[cat]||''} ${CAT_LABELS[cat]||cat}
       </button>`
-    ).join('');
+    ).join('') +
+    `<div style="width:1px;height:20px;background:var(--bd);flex-shrink:0;align-self:center"></div>` +
+    `<button class="cat-chip-m filter-chip-m${showOnlyUnknown?' active':''}" onclick="toggleUnknownFilter()" style="flex-shrink:0">
+      👁 ${showOnlyUnknown?'Tylko nieznane':'Ukryj poznane'}
+    </button>`;
 }
 
 function renderMobileChChips() {
@@ -4083,6 +4849,102 @@ window.addEventListener('resize', () => {
   }
 });
 
+
+/* ═══ LANGUAGE PICKER ═══ */
+const AVAILABLE_LANGS = [
+  {code:'el', flag:'🇬🇷', name:'Grecki'},
+  {code:'ja', flag:'🇯🇵', name:'Japoński'},
+  {code:'ko', flag:'🇰🇷', name:'Koreański'},
+  {code:'pt', flag:'🇵🇹', name:'Portugalski'},
+  {code:'tr', flag:'🇹🇷', name:'Turecki'},
+];
+const BASE_LANGS = []; // All langs removable (min 1 must remain)
+let activeLangs = JSON.parse(localStorage.getItem('kp_active_langs') || '["es","de","fr","ru","it"]');
+
+function saveActiveLangs() {
+  localStorage.setItem('kp_active_langs', JSON.stringify(activeLangs));
+}
+
+function openLangModal() {
+  const list = document.getElementById('lang-modal-list');
+  if (!list) return;
+  const ALL_LANGS_LIST = [
+    {code:'es',flag:'🇪🇸',name:'Hiszpański'},{code:'de',flag:'🇩🇪',name:'Niemiecki'},
+    {code:'fr',flag:'🇫🇷',name:'Francuski'},{code:'ru',flag:'🇷🇺',name:'Rosyjski'},
+    {code:'it',flag:'🇮🇹',name:'Włoski'},{code:'el',flag:'🇬🇷',name:'Grecki'},
+    {code:'ja',flag:'🇯🇵',name:'Japoński'},{code:'ko',flag:'🇰🇷',name:'Koreański'},
+    {code:'pt',flag:'🇵🇹',name:'Portugalski'},{code:'tr',flag:'🇹🇷',name:'Turecki'},
+  ];
+  list.innerHTML = ALL_LANGS_LIST.map(l => {
+    const isAdded = activeLangs.includes(l.code);
+    return '<div class="lang-modal-item' + (isAdded?' added':'') + '" onclick="' + (isAdded?'':'addLang(\'' + l.code + '\')') + '">' +
+      '<span class="flag">' + l.flag + '</span>' +
+      '<span>' + l.name + '</span>' +
+      (isAdded ? '<span style="margin-left:auto;font-size:10px;color:var(--tx3)">✓ Aktywny</span>' : '<span style="margin-left:auto;font-size:10px;color:var(--acc)">+ Dodaj</span>') +
+      '</div>';
+  }).join('');
+  document.getElementById('lang-modal-overlay').classList.add('open');
+}
+
+function closeLangModal() {
+  document.getElementById('lang-modal-overlay').classList.remove('open');
+}
+
+function addLang(code) {
+  if (activeLangs.includes(code)) return;
+  activeLangs.push(code);
+  saveActiveLangs();
+  renderLangButtons();
+  closeLangModal();
+  // Switch to new lang
+  const btn = document.querySelector('.lang-btn[data-lang="' + code + '"]');
+  if (btn) setLang(code, btn);
+}
+
+function removeLang(code) {
+  if (activeLangs.length <= 1) return; // Cannot remove last language
+  activeLangs = activeLangs.filter(l => l !== code);
+  saveActiveLangs();
+  if (lang === code) {
+    // Switch to first remaining lang
+    const nextLang = activeLangs[0];
+    setLang(nextLang, null);
+  }
+  renderLangButtons();
+}
+
+function renderLangButtons() {
+  const row = document.querySelector('.lang-row');
+  if (!row) return;
+  // Keep ➕ button
+  const addBtn = row.querySelector('.add-lang-btn');
+  // Rebuild lang buttons
+  const flagMap = {es:'🇪🇸',de:'🇩🇪',fr:'🇫🇷',ru:'🇷🇺',it:'🇮🇹',el:'🇬🇷',ja:'🇯🇵',ko:'🇰🇷',pt:'🇵🇹',tr:'🇹🇷'};
+  const nameMap = {es:'Hiszpański',de:'Niemiecki',fr:'Francuski',ru:'Rosyjski',it:'Włoski',el:'Grecki',ja:'Japoński',ko:'Koreański',pt:'Portugalski',tr:'Turecki'};
+  
+  // Remove existing lang buttons (not the ➕)
+  row.querySelectorAll('.lang-btn').forEach(b => b.remove());
+  
+  // Add buttons for active langs
+  activeLangs.forEach(code => {
+    const btn = document.createElement('button');
+    btn.className = 'lang-btn' + (lang === code ? ' active-' + code : '');
+    btn.dataset.lang = code;
+    const canRemove = activeLangs.length > 1;
+    btn.innerHTML = `${flagMap[code]||''} ${nameMap[code]||code}${canRemove ? ' <span class="lang-remove-btn" onclick="event.stopPropagation();removeLang(\'' + code + '\')">✕</span>' : ''}`;
+    btn.onclick = function() { setLang(code, this); };
+    if (addBtn) row.insertBefore(btn, addBtn);
+    else row.appendChild(btn);
+  });
+}
+
+// Init on load
+(function initLangButtons() {
+  const stored = JSON.parse(localStorage.getItem('kp_active_langs') || 'null');
+  if (stored && stored.length > 0) activeLangs = stored;
+  renderLangButtons();
+})();
+
 </script>
 
 <!-- MOBILE PROGRESS BAR -->
@@ -4095,6 +4957,16 @@ window.addEventListener('resize', () => {
 </div>
 
 <!-- MOBILE CAT CHIPS (inserted dynamically) -->
+
+
+<!-- LANGUAGE PICKER MODAL -->
+<div class="lang-modal-overlay" id="lang-modal-overlay" onclick="if(event.target===this)closeLangModal()">
+  <div class="lang-modal">
+    <div class="lang-modal-title">➕ Dodaj język</div>
+    <div class="lang-modal-list" id="lang-modal-list"></div>
+    <button class="lang-modal-close" onclick="closeLangModal()">Zamknij</button>
+  </div>
+</div>
 
 </body>
 </html>
