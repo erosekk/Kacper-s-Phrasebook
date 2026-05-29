@@ -3634,6 +3634,7 @@ function renderCurrent() {
   if (mode === 'cats') {
     if (typeof catF === 'string' && catF.startsWith('__ch__')) {
       renderChapterPhrasesDesktop(parseInt(catF.replace('__ch__','')));
+      updateCatsHeader();
       return;
     }
     renderCats(); updateCatsHeader();
@@ -3777,15 +3778,25 @@ function updateCatsHeader() {
   }
 
   // count shown phrases
-  const cats = catF === 'all' ? Object.keys(ld.categories) : [catF];
   let count = 0;
-  cats.forEach(c => {
-    let phrases = ld.categories[c].phrases;
-    if (searchQ) phrases = phrases.filter(p =>
-      [p.q, p.a, p.qt, p.at, p.qp].some(t => t && t.toLowerCase().includes(searchQ))
-    );
-    count += phrases.length;
-  });
+  if (typeof catF === 'string' && catF.startsWith('__ch__')) {
+    const ch = parseInt(catF.replace('__ch__', ''));
+    let phrases = getChapterPhrases(ch);
+    if (showOnlyUnknown) phrases = phrases.filter(({ key }) => !known[key]);
+    count = phrases.length;
+  } else {
+    const cats = catF === 'all' ? Object.keys(ld.categories) : [catF];
+    cats.forEach(c => {
+      let phrases = ld.categories[c].phrases;
+      if (showOnlyUnknown) {
+        phrases = phrases.filter((p, idx) => !known[knownKey(lang, c, idx)]);
+      }
+      if (searchQ) phrases = phrases.filter(p =>
+        [p.q, p.a, p.qt, p.at, p.qp].some(t => t && t.toLowerCase().includes(searchQ))
+      );
+      count += phrases.length;
+    });
+  }
   if (badge) badge.textContent = count + ' fraz';
 }
 
@@ -4086,7 +4097,7 @@ function toggleUnknownFilter() {
     btn.textContent = showOnlyUnknown ? '👁 Tylko nieznane' : '👁 Wszystkie';
   }
   if (typeof renderMobileCatChips === 'function') renderMobileCatChips();
-  renderCats();
+  renderCurrent();
   updateCatsHeader();
 }
 
@@ -4642,7 +4653,8 @@ function showChapterOverviewM() {
 function renderChapterPhrasesM(chNum) {
   const grid = document.getElementById('ch-cards-grid-m');
   if (!grid) return;
-  const phrases = getChapterPhrases(chNum);
+  let phrases = getChapterPhrases(chNum);
+  if (showOnlyUnknown) phrases = phrases.filter(({ key }) => !known[key]);
   if (!phrases.length) { grid.innerHTML = '<div style="text-align:center;color:var(--tx3);padding:2rem">Brak fraz</div>'; return; }
   let html = '';
   phrases.forEach(({ p, cat, i }) => {
@@ -4676,7 +4688,6 @@ function renderChapterPhrasesM(chNum) {
 
 function setCatChapterDesktop(chNum) {
   catF = '__ch__' + chNum;
-  showOnlyUnknown = false;
   searchQ = '';
   const si = document.getElementById('search-input');
   if (si) si.value = '';
@@ -4705,6 +4716,7 @@ function setCatChapterDesktop(chNum) {
   if (badge) badge.textContent = phrases.length + ' fraz';
 
   renderChapterPhrasesDesktop(chNum);
+  updateCatsHeader();
   renderSidebar();
   if (typeof renderMobileCatChips === 'function') renderMobileCatChips();
 }
@@ -4713,7 +4725,8 @@ function setCatChapterDesktop(chNum) {
 function renderChapterPhrasesDesktop(chNum) {
   const grid = document.getElementById('phrases-out');
   if (!grid) return;
-  const phrases = getChapterPhrases(chNum);
+  let phrases = getChapterPhrases(chNum);
+  if (showOnlyUnknown) phrases = phrases.filter(({ key }) => !known[key]);
   if (!phrases.length) { grid.innerHTML = '<div class="no-results">Brak fraz w tym rozdziale</div>'; return; }
 
   let html = '';
